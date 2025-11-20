@@ -5,7 +5,7 @@ export const sendMail = async(to,subject,text) => {
         const transporter = nodemailer.createTransport({
             host: process.env.MAILTRAP_SMTP_HOST,
             port: process.env.MAILTRAP_SMTP_PORT,
-            secure: false, // true for 465, false for other ports
+            secure: false, // true for 465, false for other ports // During production,set it to true
             auth: {
                 user: process.env.MAILTRAP_SMTP_USER,
                 pass: process.env.MAILTRAP_SMTP_PASS,
@@ -15,8 +15,7 @@ export const sendMail = async(to,subject,text) => {
             from: 'Ingest @no-reply',
             to,
             subject,
-            text, // plain‑text body
-             // HTML body
+            text, 
         })
         console.log("Message sent:", info.messageId);
         return info
