@@ -67,3 +67,32 @@ export const logout = async (req,res) => {
         return res.status(500).json({error:"Error in logging out",details:error.message})
     }
 }
+
+export const updateUser = async (req,res) => {
+    const {skills=[],role,email} = req.body
+    try {
+        if(req.user?.role !== "admin")return res.status(403).json({error:"Forbidden request"});
+        const findUser = await User.findOne({email})
+        if(!findUser)return res.status(401).status({error:"User with this email does not exist"});
+
+        await User.updateOne(
+            {email},
+            {skills:skills.length ? skills:findUser.skills,role}
+        )
+        return res.json({message:"User updated successfully"})
+    } catch (error) {
+        return res.status(500).json({error:"Error in updating user"})
+    }
+}
+
+export const getUsers = async (req,res) => {
+    try {
+        if(req.user?.role !== 'admin')return res.status(403).json({error:"Forbidden request"});
+
+        const user = await User.find().select("-password")
+        return res.json({user})
+
+    } catch (error) {
+        return res.status(500).json({error:"Error in fetching all users profile"})
+    }
+}
