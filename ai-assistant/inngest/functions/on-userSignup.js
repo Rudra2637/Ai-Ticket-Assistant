@@ -4,7 +4,7 @@ import { sendMail } from "../../utils/mailer.js";
 import { User } from "../../models/user.js";
 
 
-const onUserSignUp = inngest.createFunction(
+export const onUserSignUp = inngest.createFunction(
     {id:"on-user-signup"},
     {event:"user/signUp"},
     async({event,step}) => {

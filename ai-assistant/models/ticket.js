@@ -4,7 +4,7 @@ const ticketSchema = new mongoose.Schema({
     title:String,
     description:String,
     status:{
-        type:Stirng,
+        type:String,
         default:"In Progress"
     },
     createdBy:{
@@ -26,4 +26,4 @@ const ticketSchema = new mongoose.Schema({
     }
 })
 
-export default mongoose.model("Ticket",ticketSchema)
+export const Ticket = mongoose.model("Ticket",ticketSchema)
