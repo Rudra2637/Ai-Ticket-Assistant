@@ -3,6 +3,7 @@ import { Ticket } from "../models/ticket.js";
 
 export const createTicket = async (req,res) => {
     const {title,description} = req.body
+    // console.log("Create Ticket request: ",req.body)
     try {
         if(!title || !description) return res.status(401).json({error:"Please provide the required details"});
         const createTicket = await Ticket.create({

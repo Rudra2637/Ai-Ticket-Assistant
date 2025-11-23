@@ -20,7 +20,7 @@ function Signup() {
                 },
                 body:JSON.stringify(form)
             })
-            const data = res.json()
+            const data = await res.json()
             if(res.ok){
                 localStorage.setItem("token",data.token)
                 localStorage.setItem("user",JSON.stringify(data.user))

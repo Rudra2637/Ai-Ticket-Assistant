@@ -17,7 +17,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use("/api/auth",userRoutes)
-app.use("/api/ticket",ticketRoutes)
+app.use("/api/tickets",ticketRoutes)
 app.use("/api/inngest",serve({
     client:inngest,
     functions:[onUserSignUp,onticketCreate]
