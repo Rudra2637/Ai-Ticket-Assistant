@@ -25,6 +25,6 @@ app.use("/api/inngest",serve({
 
 mongoose.connect(process.env.MONGODB_URI)
 .then(
-    app.listen(port,() => console.log(`Server is Live on port ${port}`))
+    app.listen(port,() => console.log(`Mongo db connection successfull Server is Live on port ${port}`))
 )
 .catch((err) => console.log("Mongo Db connnection error: ",err))

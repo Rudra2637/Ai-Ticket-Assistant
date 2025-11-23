@@ -5,6 +5,7 @@ import { inngest } from '../inngest/client.js'
 
 export const signUp = async (req,res) => {
     const {email,password,skills = []} = req.body
+    console.log("Signup request: ",req.body)
     try {
         
         const hashedPassword = await bcrypt.hash(password,10)
@@ -23,7 +24,7 @@ export const signUp = async (req,res) => {
         )
         return res.json({createdUser,token})
     } catch (error) {
-        res.status(500).json({error:"Sign up failed",
+        return res.status(500).json({error:"Sign up failed",
             details:error.message
         })
     }
@@ -31,13 +32,14 @@ export const signUp = async (req,res) => {
 
 export const login = async (req,res) => {
     const {email,password} = req.body
+    
     try {
         const findUser = await User.findOne({email})
+        
         if(!findUser){
-            return res.status(402).json({error:"User not found",
-                details:error.message
-                })
+            return res.status(402).json({error:"User not found"})
         }
+        
         const comparePassword = await bcrypt.compare(password,findUser.password)
         if(!comparePassword){
             return res.status(401).json({error:"Wrong credentials",
@@ -48,7 +50,7 @@ export const login = async (req,res) => {
         const token = jwt.sign({_id:findUser._id,role:findUser.role,},process.env.JWT_SECRET)
         return res.json({findUser,token})
     } catch (error) {
-        res.status(500).json({error:"Error in logging in the user",
+        return res.status(500).json({error:"Error in logging in the user",
             details:error.message
         })
     }

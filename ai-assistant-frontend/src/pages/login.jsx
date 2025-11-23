@@ -20,14 +20,20 @@ function Login() {
                 },
                 body:JSON.stringify(form)
             })
-            const data = res.json()
+            
+            const data = await res.json()
+            
             if(res.ok){
                 localStorage.setItem("token",data.token)
-                localStorage.setItem("user",JSON.stringify(data.user))
+                localStorage.setItem("user",JSON.stringify(data.findUser))
+                console.log("Login successfull: ",data)
+                console.log("User info: ",data.user)
+                console.log("Token: ",data.token)
                 navigate("/")
             }
             else{
                 alert(data.message || "Login failed")
+                console.error("Login failed: ",error.message)
             }
 
         } catch (error) {   
