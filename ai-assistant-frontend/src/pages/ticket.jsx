@@ -19,11 +19,13 @@ function TicketDetailsPage() {
                 headers: {
                 Authorization: `Bearer ${token}`,
                 },
+                method: "GET",
             }
             );
             const data = await res.json();
+            // console.log("Fetched ticket details: ",data)
             if (res.ok) {
-            setTicket(data.ticket);
+            setTicket(data);
             } else {
             alert(data.message || "Failed to fetch ticket");
             }
@@ -69,18 +71,18 @@ function TicketDetailsPage() {
                 </p>
                 )}
 
-                {ticket.helpfulNotes && (
+                {ticket.helpfullNotes && (
                 <div>
                     <strong>Helpful Notes:</strong>
                     <div className="prose max-w-none rounded mt-2">
-                    <ReactMarkdown>{ticket.helpfulNotes}</ReactMarkdown>
+                    <ReactMarkdown>{ticket.helpfullNotes}</ReactMarkdown>
                     </div>
                 </div>
                 )}
 
-                {ticket.assignedTo && (
+                {ticket.assisgnedTo?.email && (
                 <p>
-                    <strong>Assigned To:</strong> {ticket.assignedTo?.email}
+                    <strong>Assigned To:</strong> {ticket.assisgnedTo?.email}
                 </p>
                 )}
 

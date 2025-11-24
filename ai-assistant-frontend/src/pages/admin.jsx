@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 
 function Admin() {
     const [users, setUsers] = useState([]);
@@ -21,9 +21,10 @@ function Admin() {
             },
         });
         const data = await res.json();
+        // console.log("Fetched users: ",data.user)
         if (res.ok) {
-            setUsers(data);
-            setFilteredUsers(data);
+            setUsers(data.user);
+            setFilteredUsers(data.user);
         } else {
             console.error(data.error);
         }

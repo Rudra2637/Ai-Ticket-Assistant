@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Navbar() {
     const token = localStorage.getItem("token");
     let user = localStorage.getItem("user");
-    console.log("Navbar user:",user)
     if (user) {
         user = JSON.parse(user);
     }

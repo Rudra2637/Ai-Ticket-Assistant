@@ -29,6 +29,8 @@ export const onticketCreate = inngest.createFunction(
             const relatedSkills = await step.run("ai-processing",async () => {
                 let skills = []
                 if(aiResponse){
+                    // console.log("Ai response: ",aiResponse)
+                    // console.log("Help full Notes: ",aiResponse.helpfullNotes)
                     const updateTicket = await Ticket.findByIdAndUpdate(ticket._id,{
                         priority: !["low","medium","high"].includes(aiResponse.priority) ? "medium":aiResponse.priority,
                         helpfullNotes:aiResponse.helpfullNotes,
@@ -50,6 +52,7 @@ export const onticketCreate = inngest.createFunction(
                         },
                     },
                 })
+                console.log("User found for moderation: ",user)
                 if(!user){
                     user = await User.findOne({
                         role:"admin"

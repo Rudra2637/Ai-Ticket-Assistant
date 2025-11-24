@@ -90,7 +90,7 @@ function Tickets() {
                 <Link
                     key={ticket._id}
                     className="card shadow-md p-4 bg-gray-800"
-                    to={`/tickets/${ticket._id}`}
+                    to={`/ticket/${ticket._id}`}
                 >
                     <h3 className="font-bold text-lg">{ticket.title}</h3>
                     <p className="text-sm">{ticket.description}</p>
