@@ -52,7 +52,7 @@ export const onticketCreate = inngest.createFunction(
                         },
                     },
                 })
-                console.log("User found for moderation: ",user)
+                // console.log("User found for moderation: ",user)
                 if(!user){
                     user = await User.findOne({
                         role:"admin"

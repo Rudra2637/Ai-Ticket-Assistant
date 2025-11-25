@@ -1,4 +1,3 @@
-
 # AI Ticket Assistant
 
 The AI Ticket Assistant is a smart support ticket system that leverages an AI agent to streamline the resolution process. When a new ticket is created, the AI agent automatically analyzes its content and provides an intelligent, context-aware response to guide the support team. This project aims to reduce response times and improve the efficiency of customer support operations. The application is built with a React frontend and an Express.js backend.
