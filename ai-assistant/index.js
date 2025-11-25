@@ -27,7 +27,7 @@ app.use("/api/inngest",serve({
     functions:[onUserSignUp,onticketCreate]
 }))
 
-mongoose.connect(process.env.MONGODB_URI)
+await mongoose.connect(process.env.MONGODB_URI)
 .then(
     app.listen(port,() => console.log(`Mongo db connection successfull Server is Live on port ${port}`))
 )
