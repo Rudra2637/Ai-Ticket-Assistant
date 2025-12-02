@@ -5,7 +5,6 @@ import { Ticket } from "../../models/ticket.js";
 import analyzeTicket from "../../utils/ai.js";
 import { User } from "../../models/user.js";
 
-
 export const onticketCreate = inngest.createFunction(
     {id:"on-ticket-created",retries:2},
     {event:"ticket/created"},
