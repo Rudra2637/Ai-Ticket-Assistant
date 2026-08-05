@@ -1,12 +1,13 @@
-import { createAgent,gemini } from '@inngest/agent-kit'
+import { createAgent, openai } from '@inngest/agent-kit'
 
 const analyzeTicket = async (ticket) => {
     const supportAgent = createAgent({
-        model:gemini({
-            model:'gemini-2.0-flash',
-            apiKey:process.env.GEMINI_API_KEY
+        model: openai({
+            model: 'llama-3.3-70b-versatile',
+            apiKey: process.env.GROQ_API_KEY,
+            baseUrl: 'https://api.groq.com/openai/v1'
         }),
-        name:'Ai Ticket Triage Assistant',
+        name: 'Ai Ticket Triage Assistant',
         system:`You are an expert AI assistant that processes technical support tickets. 
             Your job is to:
             1. Summarize the issue.
