@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "inngest-dev":"npx inngest-cli@latest dev"
+    "inngest-dev": "npx inngest-cli@latest dev"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +20,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "inngest": "^3.45.1",
+    "inngest": "^3.54.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.0",
     "nodemailer": "^7.0.10"
