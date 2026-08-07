@@ -28,6 +28,7 @@ function Tickets() {
                 method: "GET",
             });
             const data = await res.json();
+            console.log("Ticket data: ", data)
             const sortedData = Array.isArray(data) ? data : [];
             setTickets(sortedData);
             setFilteredTickets(sortedData);
@@ -49,8 +50,8 @@ function Tickets() {
 
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
-            result = result.filter(t => 
-                t.title.toLowerCase().includes(query) || 
+            result = result.filter(t =>
+                t.title.toLowerCase().includes(query) ||
                 t.description.toLowerCase().includes(query)
             );
         }
@@ -100,11 +101,11 @@ function Tickets() {
 
     return (
         <div className="flex h-screen w-screen bg-[var(--bg-color)] text-[var(--text-color)] overflow-hidden font-sans">
-            
+
             {/* Sidebar (Attio CRM-like style) */}
             <aside className="w-80 app-sidebar flex flex-col justify-between hidden md:flex shrink-0">
                 <div className="flex flex-col flex-1 min-h-0">
-                    
+
                     {/* Header */}
                     <div className="p-5 flex items-center justify-between border-b border-[var(--border-color)]">
                         <Link to="/" className="flex items-center gap-2.5 group">
@@ -116,7 +117,7 @@ function Tickets() {
 
                     {/* New Ticket Button */}
                     <div className="p-4">
-                        <button 
+                        <button
                             onClick={() => {
                                 document.getElementById("ticket-composer").scrollIntoView({ behavior: 'smooth' });
                                 document.getElementById("title-input")?.focus();
@@ -155,8 +156,8 @@ function Tickets() {
                         <div className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider px-3 mb-2 font-mono">Recent Threads</div>
                         <div className="space-y-0.5">
                             {tickets.slice(0, 10).map((t) => (
-                                <Link 
-                                    key={t._id} 
+                                <Link
+                                    key={t._id}
                                     to={`/ticket/${t._id}`}
                                     className="block px-3 py-1.5 rounded-lg hover:bg-slate-200/40 dark:hover:bg-slate-800/40 text-xs text-[var(--text-muted)] hover:text-[var(--text-color)] truncate transition font-medium"
                                 >
@@ -176,8 +177,8 @@ function Tickets() {
                         <span className="text-xs text-[var(--text-color)] font-bold truncate">{user?.email}</span>
                         <span className="text-[9px] font-mono text-[var(--text-muted)] uppercase font-bold tracking-widest">{user?.role || "User"}</span>
                     </div>
-                    <button 
-                        onClick={logout} 
+                    <button
+                        onClick={logout}
                         className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-[var(--text-muted)] hover:text-red-500 transition"
                         title="Logout"
                     >
@@ -190,12 +191,12 @@ function Tickets() {
 
             {/* Main Workspace Area */}
             <main className="flex-1 flex flex-col min-w-0 h-full bg-[var(--bg-color)] relative overflow-hidden">
-                
+
                 {/* Dashboard Topbar */}
                 <header className="h-16 border-b border-[var(--border-color)] bg-[var(--bg-color)] flex items-center justify-between px-6 z-10 shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-[var(--text-color)] opacity-85 md:block hidden">Support Inbox Queue</span>
-                        
+
                         {/* Mobile Header */}
                         <div className="flex items-center gap-2 md:hidden">
                             <span className="font-extrabold text-sm text-[var(--text-color)]">TicketAI</span>
@@ -206,7 +207,7 @@ function Tickets() {
                     <div className="flex items-center gap-3 w-full max-w-sm ml-auto">
                         <ThemeToggle />
                         <div className="relative w-full">
-                            <input 
+                            <input
                                 type="text"
                                 placeholder="Search ticket details..."
                                 className="w-full app-input rounded-xl pl-9 pr-4 py-1.5 text-xs placeholder-slate-400"
@@ -217,7 +218,7 @@ function Tickets() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        
+
                         {/* Mobile Logout */}
                         <button onClick={logout} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-[var(--border-color)] hover:text-red-500 transition md:hidden">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,8 +229,8 @@ function Tickets() {
                 </header>
 
                 {/* Scroll Workspace */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 pb-36">
-                    
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+
                     {/* Welcome Info Banner */}
                     <div className="p-6 rounded-2xl border border-[var(--border-color)] bg-slate-50/50 dark:bg-slate-900/10 relative overflow-hidden">
                         <div className="absolute right-[-10px] top-[-10px] w-20 h-20 rounded-full bg-purple-500/5 blur-xl"></div>
@@ -245,11 +246,10 @@ function Tickets() {
                             <button
                                 key={filter}
                                 onClick={() => setStatusFilter(filter)}
-                                className={`px-4 py-1 rounded-full text-xs font-bold tracking-tight transition ${
-                                    statusFilter === filter 
-                                    ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900" 
-                                    : "text-[var(--text-muted)] hover:text-[var(--text-color)] hover:bg-slate-50 dark:hover:bg-slate-800"
-                                }`}
+                                className={`px-4 py-1 rounded-full text-xs font-bold tracking-tight transition ${statusFilter === filter
+                                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900"
+                                        : "text-[var(--text-muted)] hover:text-[var(--text-color)] hover:bg-slate-50 dark:hover:bg-slate-800"
+                                    }`}
                             >
                                 {filter}
                             </button>
@@ -261,18 +261,18 @@ function Tickets() {
                         <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3 font-mono">
                             Active Tickets ({filteredTickets.length})
                         </h3>
-                        
+
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {filteredTickets.map((ticket) => {
-                                const pStyle = 
+                                const pStyle =
                                     ticket.priority === "high" ? "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/30 text-red-650" :
-                                    ticket.priority === "medium" ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 text-yellow-650" :
-                                    "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-650";
-                                    
+                                        ticket.priority === "medium" ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-100 dark:border-yellow-900/30 text-yellow-650" :
+                                            "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-650";
+
                                 const sStyle =
                                     ticket.status === "Done" ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-655" :
-                                    ticket.status === "In Progress" ? "bg-sky-50 dark:bg-sky-950/20 border-sky-100 dark:border-sky-900/30 text-sky-655" :
-                                    "bg-slate-100 dark:bg-slate-800 border-[var(--border-color)] text-[var(--text-muted)]";
+                                        ticket.status === "In Progress" ? "bg-sky-50 dark:bg-sky-950/20 border-sky-100 dark:border-sky-900/30 text-sky-655" :
+                                            "bg-slate-100 dark:bg-slate-800 border-[var(--border-color)] text-[var(--text-muted)]";
 
                                 return (
                                     <Link
@@ -283,7 +283,7 @@ function Tickets() {
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between gap-2">
                                                 <h4 className="font-extrabold text-sm text-[var(--text-color)] truncate flex-1">{ticket.title}</h4>
-                                                
+
                                                 <div className="flex items-center gap-1.5 shrink-0">
                                                     {ticket.status && (
                                                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono border uppercase tracking-tight ${sStyle}`}>
@@ -299,7 +299,7 @@ function Tickets() {
                                             </div>
                                             <p className="text-[var(--text-muted)] text-xs line-clamp-3 leading-relaxed font-medium">{ticket.description}</p>
                                         </div>
-                                        
+
                                         {/* Footer attributes */}
                                         <div className="border-t border-[var(--border-color)] pt-3 flex items-center justify-between mt-3">
                                             <div className="flex items-center gap-1.5 overflow-hidden">
@@ -332,8 +332,8 @@ function Tickets() {
                     </div>
                 </div>
 
-                {/* Floating Ticket Composer at the bottom */}
-                <div id="ticket-composer" className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[var(--bg-color)] via-[var(--bg-color)] to-transparent border-t border-[var(--border-color)]/20 z-10 shrink-0">
+                {/* Ticket Composer at the bottom */}
+                <div id="ticket-composer" className="p-6 bg-[var(--bg-color)] border-t border-[var(--border-color)] shrink-0 z-10">
                     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-[var(--composer-bg)] rounded-2xl border border-[var(--border-color)] shadow-[0_15px_50px_var(--shadow-color)] p-4 space-y-3 relative">
                         <div className="absolute top-[-10px] left-4 px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/30 text-[9px] font-bold text-purple-650 uppercase tracking-widest font-mono">
                             AI Co-Pilot Triage
@@ -358,10 +358,10 @@ function Tickets() {
                                 className="w-full app-input rounded-xl pl-4 pr-12 pt-3 pb-3 text-xs placeholder-slate-400 min-h-[70px] max-h-[140px] resize-y transition font-medium"
                                 required
                             />
-                            
-                            <button 
+
+                            <button
                                 className="absolute right-3 bottom-3.5 p-2 rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 shadow transition disabled:opacity-50"
-                                type="submit" 
+                                type="submit"
                                 disabled={loading}
                                 title="Submit Ticket"
                             >

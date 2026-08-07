@@ -31,6 +31,7 @@ function TicketDetailsPage() {
                 }
             );
             const data = await res.json();
+            console.log("Ticket Data: ", data)
             if (res.ok) {
                 setTicket(data);
             } else {
