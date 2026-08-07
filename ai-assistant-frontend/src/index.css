@@ -1,2 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @plugin "daisyui";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color-scheme: light;
+  
+  /* Theme Variables - LIGHT MODE */
+  --bg-color: #ffffff;
+  --text-color: #0f172a; /* slate-900 */
+  --text-muted: #64748b; /* slate-500 */
+  --border-color: rgba(226, 232, 240, 0.8); /* slate-200 */
+  --card-bg: #ffffff;
+  --sidebar-bg: #f8fafc; /* slate-50 */
+  --sidebar-border: rgba(226, 232, 240, 0.8);
+  --shadow-color: rgba(0, 0, 0, 0.03);
+  --shadow-hover: rgba(0, 0, 0, 0.06);
+  --input-bg: #f8fafc;
+  --glow-opacity: 0.1;
+  --composer-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  
+  /* Theme Variables - DARK MODE (Modern Black SaaS) */
+  --bg-color: #020617; /* slate-950 */
+  --text-color: #f8fafc; /* slate-50 */
+  --text-muted: #94a3b8; /* slate-400 */
+  --border-color: rgba(30, 41, 59, 0.8); /* slate-800 */
+  --card-bg: rgba(15, 23, 42, 0.4); /* slate-900 / 0.4 */
+  --sidebar-bg: #0b0f19; /* dark blue-slate */
+  --sidebar-border: rgba(30, 41, 59, 0.8);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-hover: rgba(147, 51, 234, 0.04);
+  --input-bg: rgba(2, 6, 23, 0.8);
+  --glow-opacity: 0.15;
+  --composer-bg: #090d16;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sidebar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.3);
+}
+
+/* Base application styling using theme variables */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+
+.app-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px -2px var(--shadow-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-card-hover:hover {
+  box-shadow: 0 10px 30px -10px var(--shadow-color), 0 0 20px 2px var(--shadow-hover);
+  border-color: rgba(168, 85, 247, 0.3);
+  transform: translateY(-1px);
+}
+
+.app-sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+
+.app-input {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  transition: all 0.2s ease;
+}
+
+.app-input:focus {
+  border-color: #7c3aed;
+  outline: none;
+}
+
+.app-text-muted {
+  color: var(--text-muted);
+}
+
+.app-border {
+  border-color: var(--border-color);
+}
+
+/* Attio style Glassmorphism */
+.glassmorphism-attio {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+}
+
+.soft-glow-purple {
+  background: radial-gradient(circle at center, rgba(168, 85, 247, var(--glow-opacity)) 0%, rgba(168, 85, 247, 0) 70%);
+}
+
+.soft-glow-blue {
+  background: radial-gradient(circle at center, rgba(59, 130, 246, var(--glow-opacity)) 0%, rgba(59, 130, 246, 0) 70%);
+}
+
+.text-gradient-purple-blue {
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue-cyan {
+  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
