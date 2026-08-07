@@ -59,9 +59,9 @@ export const login = async (req, res) => {
         const token = jwt.sign({ _id: findUser._id, role: findUser.role, }, process.env.JWT_SECRET)
         return res.json({ findUser, token })
     } catch (error) {
+        console.error("Error: ", error)
         return res.status(500).json({
-            error: "Error in logging in the user",
-            details: error.message
+            message: "Error in logging in the user",
         })
     }
 }
