@@ -14,7 +14,7 @@ export default function LandingPage() {
             <header className="w-full bg-[var(--bg-color)]/70 backdrop-blur-md px-6 lg:px-12 py-4 flex items-center justify-between border-b border-[var(--border-color)] sticky top-0 z-50 transition-colors duration-300">
                 <div className="flex items-center gap-2">
                     <span className="font-extrabold text-lg tracking-tight text-[var(--text-color)]">
-                        AI Ticket Assitant
+                        AI Ticket Assistant
                     </span>
                 </div>
 
