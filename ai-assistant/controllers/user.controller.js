@@ -83,17 +83,41 @@ export const logout = async (req, res) => {
 export const updateUser = async (req, res) => {
     const { skills = [], role, email } = req.body
     try {
-        if (req.user?.role !== "admin") return res.status(403).json({ error: "Forbidden request" });
-        const findUser = await User.findOne({ email })
-        if (!findUser) return res.status(401).status({ error: "User with this email does not exist" });
+        let findUser;
+        if (email) {
+            findUser = await User.findOne({ email });
+        } else {
+            findUser = await User.findById(req.user._id);
+        }
 
+        if (!findUser) return res.status(404).json({ error: "User does not exist" });
+
+        // Non-admins can only update their own profile skills
+        if (req.user?.role !== "admin") {
+            if (findUser._id.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ error: "Forbidden: You can only update your own profile" });
+            }
+
+            await User.updateOne(
+                { _id: findUser._id },
+                { skills }
+            );
+            const updatedUser = await User.findById(findUser._id).select("-password");
+            return res.json({ message: "Profile skills updated successfully", user: updatedUser });
+        }
+
+        // Admins can ONLY update roles. Users manage their own skills directly.
         await User.updateOne(
-            { email },
-            { skills: skills.length ? skills : findUser.skills, role }
-        )
-        return res.json({ message: "User updated successfully" })
+            { _id: findUser._id },
+            {
+                role: role || findUser.role
+            }
+        );
+        const updatedUser = await User.findById(findUser._id).select("-password");
+        return res.json({ message: "User role updated successfully", user: updatedUser });
     } catch (error) {
-        return res.status(500).json({ error: "Error in updating user" })
+        console.error("Error updating user:", error);
+        return res.status(500).json({ error: "Error in updating user" });
     }
 }
 

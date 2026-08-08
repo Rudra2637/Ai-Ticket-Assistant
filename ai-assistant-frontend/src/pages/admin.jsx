@@ -6,7 +6,7 @@ function Admin() {
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
-    const [formData, setFormData] = useState({ role: "", skills: "" });
+    const [formData, setFormData] = useState({ role: "" });
     const [searchQuery, setSearchQuery] = useState("");
 
     const token = localStorage.getItem("token");
@@ -48,7 +48,6 @@ function Admin() {
         setEditingUser(user.email);
         setFormData({
             role: user.role,
-            skills: user.skills?.join(", ") || "",
         });
     };
 
@@ -65,23 +64,19 @@ function Admin() {
                     body: JSON.stringify({
                         email: editingUser,
                         role: formData.role,
-                        skills: formData.skills
-                            .split(",")
-                            .map((skill) => skill.trim())
-                            .filter(Boolean),
                     }),
                 }
             );
 
             const data = await res.json();
             if (!res.ok) {
-                alert(data.error || "Failed to update user");
-                console.error(data.error || "Failed to update user");
+                alert(data.error || "Failed to update user role");
+                console.error(data.error || "Failed to update user role");
                 return;
             }
 
             setEditingUser(null);
-            setFormData({ role: "", skills: "" });
+            setFormData({ role: "" });
             fetchUsers();
         } catch (err) {
             console.error("Update failed", err);
@@ -289,39 +284,27 @@ function Admin() {
                                         {/* Edit Controls */}
                                         <div className="shrink-0 flex items-center gap-2">
                                             {editingUser === userItem.email ? (
-                                                <div className="bg-[var(--input-bg)] p-5 rounded-2xl border border-[var(--border-color)] space-y-4 w-full md:w-80 shadow-inner">
-                                                    <div className="text-xs font-bold text-[var(--text-muted)] font-mono">EDITING USER</div>
+                                                <div className="bg-[var(--input-bg)] p-4 rounded-2xl border border-[var(--border-color)] space-y-3 w-full md:w-72 shadow-inner">
+                                                    <div className="text-[10px] font-bold text-[var(--text-muted)] font-mono uppercase tracking-wider">CHANGE USER ROLE</div>
                                                     
-                                                    <div className="space-y-3">
-                                                        <select
-                                                            className="w-full bg-[var(--bg-color)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs text-[var(--text-color)] focus:outline-none focus:border-purple-650"
-                                                            value={formData.role}
-                                                            onChange={(e) =>
-                                                                setFormData({ ...formData, role: e.target.value })
-                                                            }
-                                                        >
-                                                            <option value="user">User</option>
-                                                            <option value="moderator">Moderator</option>
-                                                            <option value="admin">Admin</option>
-                                                        </select>
+                                                    <select
+                                                        className="w-full bg-[var(--bg-color)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs text-[var(--text-color)] focus:outline-none focus:border-purple-650 font-medium"
+                                                        value={formData.role}
+                                                        onChange={(e) =>
+                                                            setFormData({ ...formData, role: e.target.value })
+                                                        }
+                                                    >
+                                                        <option value="user">User (Client)</option>
+                                                        <option value="moderator">Moderator (Support Agent)</option>
+                                                        <option value="admin">Admin (System Manager)</option>
+                                                    </select>
 
-                                                        <input
-                                                            type="text"
-                                                            placeholder="e.g. React, Node.js"
-                                                            className="w-full bg-[var(--bg-color)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs text-[var(--text-color)] placeholder-slate-400 focus:outline-none focus:border-purple-650"
-                                                            value={formData.skills}
-                                                            onChange={(e) =>
-                                                                setFormData({ ...formData, skills: e.target.value })
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    <div className="flex gap-2">
+                                                    <div className="flex gap-2 pt-1">
                                                         <button
                                                             className="px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-xs font-bold text-white dark:text-slate-900 transition shadow-sm"
                                                             onClick={handleUpdate}
                                                         >
-                                                            Save
+                                                            Save Role
                                                         </button>
                                                         <button
                                                             className="px-3.5 py-1.5 rounded-full border border-[var(--border-color)] bg-[var(--bg-color)] hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold text-[var(--text-color)] transition shadow-sm"
@@ -336,7 +319,7 @@ function Admin() {
                                                     className="px-4 py-2 rounded-full bg-[var(--input-bg)] border border-[var(--border-color)] hover:border-purple-500/50 text-[var(--text-color)] text-xs font-bold transition shadow-sm"
                                                     onClick={() => handleEditClick(userItem)}
                                                 >
-                                                    Modify Profile
+                                                    Change Role
                                                 </button>
                                             )}
                                         </div>
