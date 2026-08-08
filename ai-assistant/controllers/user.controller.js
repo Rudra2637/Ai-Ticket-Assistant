@@ -100,7 +100,8 @@ export const updateUser = async (req, res) => {
 
             await User.updateOne(
                 { _id: findUser._id },
-                { skills }
+                { skills: req.body.skills ?? findUser.skills },
+                { runValidators: true }
             );
             const updatedUser = await User.findById(findUser._id).select("-password");
             return res.json({ message: "Profile skills updated successfully", user: updatedUser });
