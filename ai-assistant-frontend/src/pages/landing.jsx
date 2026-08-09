@@ -4,7 +4,7 @@ import ThemeToggle from "../components/themeToggle";
 export default function LandingPage() {
     return (
         <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-color)] selection:bg-purple-100 selection:text-purple-900 overflow-hidden relative font-sans transition-colors duration-300 cyber-grid">
-            
+
             {/* Ambient Pastel Background Glows */}
             <div className="absolute top-[10%] left-[-15%] w-[60%] h-[50%] rounded-full bg-blue-400/10 blur-[130px] -z-10"></div>
             <div className="absolute top-[5%] right-[-15%] w-[60%] h-[50%] rounded-full bg-purple-400/10 blur-[130px] -z-10"></div>
@@ -14,10 +14,10 @@ export default function LandingPage() {
             <header className="w-full bg-[var(--bg-color)]/70 backdrop-blur-md px-6 lg:px-12 py-4 flex items-center justify-between border-b border-[var(--border-color)] sticky top-0 z-50 transition-colors duration-300">
                 <div className="flex items-center gap-2">
                     <span className="font-extrabold text-lg tracking-tight text-[var(--text-color)]">
-                        TicketAI
+                        AI Ticket Assistant
                     </span>
                 </div>
-                
+
                 {/* Center nav links */}
                 <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[var(--text-muted)]">
                     <a href="#features" className="hover:text-[var(--text-color)] transition">Product</a>
@@ -37,7 +37,7 @@ export default function LandingPage() {
 
             {/* Hero Section */}
             <main className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-20 pb-28 text-center flex flex-col items-center">
-                
+
                 {/* Hero Title */}
                 <h1 className="text-5xl sm:text-7xl font-black tracking-tight text-[var(--text-color)] leading-[1.08] max-w-4xl mb-6">
                     The next generation <br />
@@ -51,16 +51,16 @@ export default function LandingPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-20">
-                    <Link 
-                        to="/signup" 
-                        className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-slate-955 dark:bg-slate-50 text-white dark:text-slate-900 hover:bg-slate-850 dark:hover:bg-slate-200 text-sm font-bold shadow-md shadow-slate-950/10 transition flex items-center justify-center gap-2 group"
+                    <Link
+                        to="/signup"
+                        className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-slate-955 dark:bg-slate-50 text-dark dark:text-slate-900 hover:bg-slate-850 dark:hover:bg-slate-200 text-sm font-bold shadow-md shadow-slate-950/10 transition flex items-center justify-center gap-2 group"
                     >
-                        Start for free 
+                        Start for free
                         <svg className="w-4 h-4 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </Link>
-                    <a 
+                    <a
                         href="#features"
                         className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm font-bold transition flex items-center justify-center"
                     >
@@ -71,7 +71,7 @@ export default function LandingPage() {
                 {/* Visual UI Mockup (Attio Style Dashboard) */}
                 <div className="relative w-full max-w-5xl rounded-2xl border border-[var(--border-color)] bg-[var(--bg-color)] p-2.5 shadow-[0_30px_100px_var(--shadow-color)] transition-all">
                     <div className="rounded-xl overflow-hidden border border-[var(--border-color)] bg-[var(--sidebar-bg)] aspect-[16/10] flex flex-col text-left">
-                        
+
                         {/* Mock App Header */}
                         <div className="h-14 border-b border-[var(--border-color)] bg-[var(--bg-color)] flex items-center justify-between px-6">
                             <div className="flex items-center gap-1.5">
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
                         {/* Content Grid */}
                         <div className="flex-1 flex overflow-hidden">
-                            
+
                             {/* Left Side menu */}
                             <div className="w-56 bg-[var(--bg-color)] border-r border-[var(--border-color)] p-4 space-y-6 hidden sm:block shrink-0">
                                 <div className="space-y-1">
@@ -121,7 +121,7 @@ export default function LandingPage() {
                                     <h4 className="text-sm font-extrabold text-[var(--text-color)]">Support Inbox</h4>
                                     <span className="px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/20 text-purple-650 text-xs font-bold border border-purple-100/30">AI Autopilot Running</span>
                                 </div>
-                                
+
                                 <div className="border border-[var(--border-color)] rounded-xl overflow-hidden bg-[var(--bg-color)] flex-1 flex flex-col">
                                     {/* Table Header */}
                                     <div className="grid grid-cols-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
@@ -130,7 +130,7 @@ export default function LandingPage() {
                                         <div>Priority</div>
                                         <div>Assigned Moderator</div>
                                     </div>
-                                    
+
                                     {/* Table Rows */}
                                     <div className="flex-1 divide-y divide-[var(--border-color)] text-xs text-[var(--text-color)]">
                                         <div className="grid grid-cols-4 px-4 py-3.5 items-center">
