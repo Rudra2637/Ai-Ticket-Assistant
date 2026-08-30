@@ -4,7 +4,7 @@ import { User } from '../models/user.js'
 import { inngest } from '../inngest/client.js'
 
 export const signUp = async (req, res) => {
-    const { email, password, skills = [] } = req.body
+    const { email, password, skills = [], role = "user" } = req.body
     // console.log("Signup request: ", req.body)
     try {
 
@@ -16,7 +16,7 @@ export const signUp = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        const user = await User.create({ email, password: hashedPassword, skills })
+        const user = await User.create({ email, password: hashedPassword, skills, role: role || "user" })
 
         //Inngest Function call
         await inngest.send({
@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
             "-password "
         )
 
-        return res.status(200).json({ createdUser, token })
+        return res.status(200).json({ createdUser, token, message: "Account created successfully" })
     } catch (error) {
         return res.status(500).json({
             error: "Sign up failed",
@@ -126,10 +126,11 @@ export const getUsers = async (req, res) => {
     try {
         if (req.user?.role !== 'admin') return res.status(403).json({ error: "Forbidden request" });
 
-        const user = await User.find().select("-password")
+        // Admins only view and manage support moderators
+        const user = await User.find({ role: "moderator" }).select("-password").sort({ createdAt: -1 });
         return res.json({ user })
 
     } catch (error) {
-        return res.status(500).json({ error: "Error in fetching all users profile" })
+        return res.status(500).json({ error: "Error in fetching moderators" })
     }
 }
