@@ -1,0 +1,31 @@
+{
+  "name": "ai-ticket-assistant-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "npm@10.9.3",
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "dashboard"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:backend": "turbo dev --filter=@ticket-assistant/backend",
+    "dev:dashboard": "turbo dev --filter=@ticket-assistant/dashboard",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "keywords": [
+    "ai",
+    "ticketing",
+    "triage",
+    "inngest",
+    "turborepo",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  }
+}
