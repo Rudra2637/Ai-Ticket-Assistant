@@ -1,22 +1,22 @@
 import { inngest } from "../inngest/client.js";
-import { Ticket } from "../models/ticket.js";
+import { storage } from "../storage/index.js";
 
 export const createTicket = async (req, res) => {
     const { title, description } = req.body
-    // console.log("Create Ticket request: ",req.body)
     try {
-        if (!title || !description) return res.status(400).json({ error: "Please provide the required details" });
-        const createTicket = await Ticket.create({
+        if (!title || !description) return res.status(400).json({ error: "Please provide the required details" });
+
+        const createdTicket = await storage.createTicket({
             title,
             description,
             createdBy: req.user?._id.toString()
         })
 
-        //Inngest Call
+        // Inngest Call
         await inngest.send({
             name: "ticket/created",
             data: {
-                ticketId: createTicket._id.toString(),
+                ticketId: (createdTicket._id || createdTicket.id).toString(),
                 title,
                 description,
                 createdBy: req.user._id.toString()
@@ -25,7 +25,7 @@ export const createTicket = async (req, res) => {
 
         return res.status(201).json({
             message: "Ticket created Successfully",
-            ticket: createTicket
+            ticket: createdTicket
         })
 
     } catch (error) {
@@ -38,24 +38,18 @@ export const getTickets = async (req, res) => {
     try {
         const user = req.user
         let tickets = []
-        
+
         if (user.role === "admin") {
             // Admins can see all tickets
-            tickets = await Ticket.find({})
-                .populate("assisgnedTo", ["email", "_id"])
-                .sort({ createdAt: -1 })
+            tickets = await storage.getTickets({})
         }
         else if (user.role === "moderator") {
             // Moderators can only see tickets assigned to them
-            tickets = await Ticket.find({ assisgnedTo: user._id })
-                .populate("assisgnedTo", ["email", "_id"])
-                .sort({ createdAt: -1 })
+            tickets = await storage.getTickets({ assignedTo: user._id })
         }
         else {
             // Users can only see tickets created by them
-            tickets = await Ticket.find({ createdBy: user._id })
-                .select("title description status createdAt")
-                .sort({ createdAt: -1 })
+            tickets = await storage.getTickets({ createdBy: user._id })
         }
         return res.status(200).json(tickets)
     } catch (error) {
@@ -67,29 +61,25 @@ export const getTickets = async (req, res) => {
 export const getTicket = async (req, res) => {
     try {
         const user = req.user
-        let ticket;
-        
-        if (user.role === "admin") {
-            ticket = await Ticket.findById(req.params.id).populate("assisgnedTo", ["email", "_id"])
-        }
-        else if (user.role === "moderator") {
-            // Moderators can only access tickets assigned to them
-            ticket = await Ticket.findOne({
-                _id: req.params.id,
-                assisgnedTo: user._id
-            }).populate("assisgnedTo", ["email", "_id"])
-        }
-        else {
-            ticket = await Ticket.findOne({
-                createdBy: user._id,
-                _id: req.params.id
-            }).select("title description status createdAt")
-                .populate("assisgnedTo", ["email", "_id"])
-        }
+        const ticket = await storage.getTicketById(req.params.id)
 
         if (!ticket) {
-            return res.status(404).json({ message: "Ticket does not exist or access denied" })
+            return res.status(404).json({ message: "Ticket does not exist" })
         }
+
+        // Access control
+        if (user.role === "moderator") {
+            const assignedId = ticket.assisgnedTo?._id || ticket.assisgnedTo?.id || ticket.assisgnedTo;
+            if (assignedId?.toString() !== user._id.toString()) {
+                return res.status(403).json({ message: "Access denied" });
+            }
+        } else if (user.role === "user") {
+            const creatorId = ticket.createdBy?._id || ticket.createdBy?.id || ticket.createdBy;
+            if (creatorId?.toString() !== user._id.toString()) {
+                return res.status(403).json({ message: "Access denied" });
+            }
+        }
+
         return res.status(200).json(ticket);
 
     } catch (error) {

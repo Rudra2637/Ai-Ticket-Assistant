@@ -1,14 +1,14 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { User } from '../models/user.js'
 import { inngest } from '../inngest/client.js'
+import { storage } from '../storage/index.js'
 
 export const signUp = async (req, res) => {
-    const { email, password, skills = [] } = req.body
+    const { email, password, skills = [], role = "user" } = req.body
     // console.log("Signup request: ", req.body)
     try {
 
-        const userExist = await User.findOne({ email })
+        const userExist = await storage.getUserByEmail(email)
         if (userExist) {
             return res.status(403).json({
                 message: "Account already exist, Try login"
@@ -16,7 +16,12 @@ export const signUp = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        const user = await User.create({ email, password: hashedPassword, skills })
+        const user = await storage.createUser({
+            email,
+            password: hashedPassword,
+            skills,
+            role: role || "user"
+        })
 
         //Inngest Function call
         await inngest.send({
@@ -26,11 +31,9 @@ export const signUp = async (req, res) => {
             }
         })
         const token = jwt.sign({ _id: user._id, role: user.role, }, process.env.JWT_SECRET)
-        const createdUser = await User.findById(user._id).select(
-            "-password "
-        )
+        const createdUser = await storage.getUserById(user._id)
 
-        return res.status(200).json({ createdUser, token })
+        return res.status(200).json({ createdUser, token, message: "Account created successfully" })
     } catch (error) {
         return res.status(500).json({
             error: "Sign up failed",
@@ -43,7 +46,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body
 
     try {
-        const findUser = await User.findOne({ email })
+        const findUser = await storage.getUserByEmail(email)
 
         if (!findUser) {
             return res.status(402).json({ message: "User not found" })
@@ -85,9 +88,9 @@ export const updateUser = async (req, res) => {
     try {
         let findUser;
         if (email) {
-            findUser = await User.findOne({ email });
+            findUser = await storage.getUserByEmail(email)
         } else {
-            findUser = await User.findById(req.user._id);
+            findUser = await storage.getUserById(req.user._id)
         }
 
         if (!findUser) return res.status(404).json({ error: "User does not exist" });
@@ -98,23 +101,18 @@ export const updateUser = async (req, res) => {
                 return res.status(403).json({ error: "Forbidden: You can only update your own profile" });
             }
 
-            await User.updateOne(
-                { _id: findUser._id },
-                { skills: req.body.skills ?? findUser.skills },
-                { runValidators: true }
-            );
-            const updatedUser = await User.findById(findUser._id).select("-password");
+            const updatedUser = await storage.updateUser(findUser._id, {
+                skills: req.body.skills ?? findUser.skills
+            });
+
             return res.json({ message: "Profile skills updated successfully", user: updatedUser });
         }
 
         // Admins can ONLY update roles. Users manage their own skills directly.
-        await User.updateOne(
-            { _id: findUser._id },
-            {
-                role: role || findUser.role
-            }
-        );
-        const updatedUser = await User.findById(findUser._id).select("-password");
+        const updatedUser = await storage.updateUser(findUser._id, {
+            role: role || findUser.role
+        });
+
         return res.json({ message: "User role updated successfully", user: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
@@ -126,10 +124,10 @@ export const getUsers = async (req, res) => {
     try {
         if (req.user?.role !== 'admin') return res.status(403).json({ error: "Forbidden request" });
 
-        const user = await User.find().select("-password")
-        return res.json({ user })
+        const user = await storage.getUsers({ role: "moderator" });
+        return res.json({ user });
 
     } catch (error) {
-        return res.status(500).json({ error: "Error in fetching all users profile" })
+        return res.status(500).json({ error: "Error in fetching moderators" });
     }
 }
