@@ -4,7 +4,7 @@ import { inngest } from '../inngest/client.js'
 import { storage } from '../storage/index.js'
 
 export const signUp = async (req, res) => {
-    const { email, password, skills = [], role = "user" } = req.body
+    const { email, password, skills = [] } = req.body
     // console.log("Signup request: ", req.body)
     try {
 
@@ -124,10 +124,10 @@ export const getUsers = async (req, res) => {
     try {
         if (req.user?.role !== 'admin') return res.status(403).json({ error: "Forbidden request" });
 
-        const user = await storage.getUsers({ role: "moderator" });
-        return res.json({ user });
+        const user = await User.find().select("-password")
+        return res.json({ user })
 
     } catch (error) {
-        return res.status(500).json({ error: "Error in fetching moderators" });
+        return res.status(500).json({ error: "Error in fetching all users profile" })
     }
 }
