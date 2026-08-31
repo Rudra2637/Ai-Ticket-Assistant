@@ -1,7 +1,7 @@
 import { inngest } from "../client.js";
 import { NonRetriableError } from "inngest";
 import { sendMail } from "../../utils/mailer.js";
-import { User } from "../../models/user.js";
+import { storage } from "../../storage/index.js";
 
 
 export const onUserSignUp = inngest.createFunction(
@@ -12,7 +12,7 @@ export const onUserSignUp = inngest.createFunction(
             console.log("From Inngest")
             const { email } = event.data
             const userCheck = await step.run("check-user-email", async () => {
-                const validUser = await User.findOne({ email })
+                const validUser = await storage.getUserByEmail(email)
                 if (!validUser) throw new NonRetriableError("User no longer exists in our database")
                 else return validUser
             })
