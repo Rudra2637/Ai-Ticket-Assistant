@@ -6,33 +6,34 @@
 export class BaseStorageAdapter {
     async connect() {}
     async disconnect() {}
+    async runMigrations() {}
 
     // ==========================================
-    // USER & MODERATOR METHODS
+    // AGENT METHODS
     // ==========================================
 
-    async createUser(userData) {
-        throw new Error("createUser() must be implemented by storage adapter");
+    async createAgent(agentData) {
+        throw new Error("createAgent() must be implemented by storage adapter");
     }
 
-    async getUserByEmail(email) {
-        throw new Error("getUserByEmail() must be implemented by storage adapter");
+    async getAgentByEmail(email) {
+        throw new Error("getAgentByEmail() must be implemented by storage adapter");
     }
 
-    async getUserById(id) {
-        throw new Error("getUserById() must be implemented by storage adapter");
+    async getAgentById(id) {
+        throw new Error("getAgentById() must be implemented by storage adapter");
     }
 
-    async getUsers(filter = {}) {
-        throw new Error("getUsers() must be implemented by storage adapter");
+    async getAgents(filter = {}) {
+        throw new Error("getAgents() must be implemented by storage adapter");
     }
 
-    async getUsersByRole(role) {
-        throw new Error("getUsersByRole() must be implemented by storage adapter");
+    async updateAgent(id, updates) {
+        throw new Error("updateAgent() must be implemented by storage adapter");
     }
 
-    async updateUser(id, updates) {
-        throw new Error("updateUser() must be implemented by storage adapter");
+    async deleteAgent(id) {
+        throw new Error("deleteAgent() must be implemented by storage adapter");
     }
 
     // ==========================================
@@ -59,3 +60,4 @@ export class BaseStorageAdapter {
         throw new Error("deleteTicket() must be implemented by storage adapter");
     }
 }
+

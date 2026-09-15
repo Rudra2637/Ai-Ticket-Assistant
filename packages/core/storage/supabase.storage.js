@@ -23,87 +23,137 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
         }
     }
 
+    /**
+     * Checks if ticketai_* tables exist in Supabase.
+     * If not, prints the SQL to run manually in Supabase SQL Editor and returns false.
+     */
+    async runMigrations() {
+        const { error } = await this.supabase
+            .from('ticketai_agents')
+            .select('id')
+            .limit(1);
+
+        if (!error) return true;
+
+        const sql = `
+-- TicketAI Framework Tables
+-- Run this SQL in your Supabase SQL Editor (or psql)
+
+CREATE TABLE IF NOT EXISTS ticketai_agents (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    name TEXT,
+    skills TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ticketai_tickets (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT DEFAULT 'open',
+    created_by TEXT,
+    assigned_to UUID REFERENCES ticketai_agents(id) ON DELETE SET NULL,
+    priority TEXT,
+    deadline TIMESTAMPTZ,
+    helpful_notes TEXT,
+    related_skills TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+        `;
+        console.log("\n📋 Run the following SQL in your Supabase database:\n");
+        console.log(sql);
+        return false;
+    }
+
     // ==========================================
-    // USER METHODS
+    // AGENT METHODS
     // ==========================================
 
-    async createUser(userData) {
+    async createAgent(agentData) {
         const payload = {
-            email: userData.email,
-            password: userData.password,
-            role: userData.role || 'user',
-            skills: Array.isArray(userData.skills) ? userData.skills : []
+            email: agentData.email,
+            name: agentData.name || null,
+            skills: Array.isArray(agentData.skills) ? agentData.skills : []
         };
 
         const { data, error } = await this.supabase
-            .from('users')
+            .from('ticketai_agents')
             .insert(payload)
             .select()
             .single();
 
         if (error) throw error;
-        return this._formatUser(data);
+        return this._formatAgent(data);
     }
 
-    async getUserByEmail(email) {
+    async getAgentByEmail(email) {
         const { data, error } = await this.supabase
-            .from('users')
+            .from('ticketai_agents')
             .select('*')
             .eq('email', email)
             .maybeSingle();
 
         if (error) throw error;
-        return data ? this._formatUser(data) : null;
+        return data ? this._formatAgent(data) : null;
     }
 
-    async getUserById(id) {
+    async getAgentById(id) {
         const { data, error } = await this.supabase
-            .from('users')
-            .select('id, email, role, skills, created_at')
+            .from('ticketai_agents')
+            .select('*')
             .eq('id', id)
             .maybeSingle();
 
         if (error) throw error;
-        return data ? this._formatUser(data) : null;
+        return data ? this._formatAgent(data) : null;
     }
 
-    async getUsers(filter = {}) {
+    async getAgents(filter = {}) {
         let query = this.supabase
-            .from('users')
-            .select('id, email, role, skills, created_at')
+            .from('ticketai_agents')
+            .select('*')
             .order('created_at', { ascending: false });
 
-        if (filter.role) {
-            query = query.eq('role', filter.role);
-        }
         if (filter.email) {
             query = query.eq('email', filter.email);
+        }
+        if (filter.skills) {
+            const skills = Array.isArray(filter.skills) ? filter.skills : [filter.skills];
+            query = query.overlaps('skills', skills);
         }
 
         const { data, error } = await query;
         if (error) throw error;
-        return (data || []).map(u => this._formatUser(u));
+        return (data || []).map(a => this._formatAgent(a));
     }
 
-    async getUsersByRole(role) {
-        return this.getUsers({ role });
-    }
-
-    async updateUser(id, updates) {
+    async updateAgent(id, updates) {
         const payload = {};
-        if (updates.role !== undefined) payload.role = updates.role;
-        if (updates.skills !== undefined) payload.skills = updates.skills;
+        if (updates.name !== undefined) payload.name = updates.name;
         if (updates.email !== undefined) payload.email = updates.email;
+        if (updates.skills !== undefined) payload.skills = Array.isArray(updates.skills) ? updates.skills : [];
 
         const { data, error } = await this.supabase
-            .from('users')
+            .from('ticketai_agents')
             .update(payload)
             .eq('id', id)
-            .select('id, email, role, skills, created_at')
-            .single();
+            .select()
+            .maybeSingle();
 
         if (error) throw error;
-        return this._formatUser(data);
+        return data ? this._formatAgent(data) : null;
+    }
+
+    async deleteAgent(id) {
+        const { data, error } = await this.supabase
+            .from('ticketai_agents')
+            .delete()
+            .eq('id', id)
+            .select();
+
+        if (error) throw error;
+        return data && data.length > 0;
     }
 
     // ==========================================
@@ -114,19 +164,19 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
         const payload = {
             title: ticketData.title,
             description: ticketData.description,
-            created_by: ticketData.createdBy || ticketData.created_by,
-            status: ticketData.status || 'In Progress',
+            created_by: ticketData.createdBy || ticketData.created_by || null,
+            status: ticketData.status || 'open',
             priority: ticketData.priority || 'medium',
-            assigned_to: ticketData.assignedTo || ticketData.assisgnedTo || ticketData.assigned_to || null,
+            assigned_to: ticketData.assignedTo || ticketData.assigned_to || null,
             related_skills: ticketData.relatedSkills || ticketData.related_skills || [],
-            helpful_notes: ticketData.helpfulNotes || ticketData.helpfullNotes || ticketData.helpful_notes || '',
-            deadline: ticketData.deadLine || ticketData.deadline || null
+            helpful_notes: ticketData.helpfulNotes || ticketData.helpful_notes || '',
+            deadline: ticketData.deadline || ticketData.deadLine || null
         };
 
         const { data, error } = await this.supabase
-            .from('tickets')
+            .from('ticketai_tickets')
             .insert(payload)
-            .select('*, assigned_to_user:users!assigned_to(id, email)')
+            .select('*, assigned_to:ticketai_agents!assigned_to(id, email, name, skills)')
             .single();
 
         if (error) throw error;
@@ -135,8 +185,8 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
 
     async getTicketById(id) {
         const { data, error } = await this.supabase
-            .from('tickets')
-            .select('*, assigned_to_user:users!assigned_to(id, email)')
+            .from('ticketai_tickets')
+            .select('*, assigned_to:ticketai_agents!assigned_to(id, email, name, skills)')
             .eq('id', id)
             .maybeSingle();
 
@@ -146,16 +196,16 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
 
     async getTickets(filter = {}) {
         let query = this.supabase
-            .from('tickets')
-            .select('*, assigned_to_user:users!assigned_to(id, email)')
+            .from('ticketai_tickets')
+            .select('*, assigned_to:ticketai_agents!assigned_to(id, email, name, skills)')
             .order('created_at', { ascending: false });
 
         if (filter.createdBy || filter.created_by) {
             query = query.eq('created_by', filter.createdBy || filter.created_by);
         }
 
-        if (filter.assignedTo || filter.assisgnedTo || filter.assigned_to) {
-            query = query.eq('assigned_to', filter.assignedTo || filter.assisgnedTo || filter.assigned_to);
+        if (filter.assignedTo || filter.assigned_to) {
+            query = query.eq('assigned_to', filter.assignedTo || filter.assigned_to);
         }
 
         if (filter.status) {
@@ -171,33 +221,33 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
         const payload = {};
         if (updates.status !== undefined) payload.status = updates.status;
         if (updates.priority !== undefined) payload.priority = updates.priority;
-        if (updates.assignedTo !== undefined || updates.assisgnedTo !== undefined || updates.assigned_to !== undefined) {
-            payload.assigned_to = updates.assignedTo || updates.assisgnedTo || updates.assigned_to;
+        if (updates.assignedTo !== undefined || updates.assigned_to !== undefined) {
+            payload.assigned_to = updates.assignedTo !== undefined ? updates.assignedTo : updates.assigned_to;
         }
-        if (updates.helpfulNotes !== undefined || updates.helpfullNotes !== undefined) {
-            payload.helpful_notes = updates.helpfulNotes || updates.helpfullNotes;
+        if (updates.helpfulNotes !== undefined || updates.helpful_notes !== undefined) {
+            payload.helpful_notes = updates.helpfulNotes || updates.helpful_notes;
         }
         if (updates.relatedSkills !== undefined || updates.related_skills !== undefined) {
             payload.related_skills = updates.relatedSkills || updates.related_skills;
         }
-        if (updates.deadLine !== undefined || updates.deadline !== undefined) {
-            payload.deadline = updates.deadLine || updates.deadline;
+        if (updates.deadline !== undefined || updates.deadLine !== undefined) {
+            payload.deadline = updates.deadline || updates.deadLine;
         }
 
         const { data, error } = await this.supabase
-            .from('tickets')
+            .from('ticketai_tickets')
             .update(payload)
             .eq('id', id)
-            .select('*, assigned_to_user:users!assigned_to(id, email)')
-            .single();
+            .select('*, assigned_to:ticketai_agents!assigned_to(id, email, name, skills)')
+            .maybeSingle();
 
         if (error) throw error;
-        return this._formatTicket(data);
+        return data ? this._formatTicket(data) : null;
     }
 
     async deleteTicket(id) {
         const { error } = await this.supabase
-            .from('tickets')
+            .from('ticketai_tickets')
             .delete()
             .eq('id', id);
 
@@ -209,32 +259,40 @@ export class SupabaseStorageAdapter extends BaseStorageAdapter {
     // FORMATTING HELPERS
     // ==========================================
 
-    _formatUser(user) {
-        if (!user) return null;
+    _formatAgent(agent) {
+        if (!agent) return null;
         return {
-            ...user,
-            _id: user.id,
-            id: user.id
+            ...agent,
+            _id: agent.id,
+            id: agent.id
         };
     }
 
     _formatTicket(ticket) {
         if (!ticket) return null;
-        const formatted = {
+        const assignedAgent = ticket.assigned_to && typeof ticket.assigned_to === 'object'
+            ? {
+                _id: ticket.assigned_to.id,
+                id: ticket.assigned_to.id,
+                email: ticket.assigned_to.email,
+                name: ticket.assigned_to.name,
+                skills: ticket.assigned_to.skills || []
+            }
+            : (ticket.assigned_to || null);
+
+        return {
             ...ticket,
             _id: ticket.id,
             id: ticket.id,
             createdBy: ticket.created_by,
+            status: ticket.status || 'open',
+            priority: ticket.priority,
+            helpfulNotes: ticket.helpful_notes || '',
             relatedSkills: ticket.related_skills || [],
-            helpfullNotes: ticket.helpful_notes || '',
-            deadLine: ticket.deadline,
-            // Format populated moderator data matching MongoDB's assisgnedTo structure
-            assisgnedTo: ticket.assigned_to_user ? {
-                _id: ticket.assigned_to_user.id,
-                id: ticket.assigned_to_user.id,
-                email: ticket.assigned_to_user.email
-            } : (ticket.assigned_to || null)
+            deadline: ticket.deadline,
+            assignedTo: assignedAgent,
+            createdAt: ticket.created_at
         };
-        return formatted;
     }
 }
+

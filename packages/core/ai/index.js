@@ -18,8 +18,28 @@ export function createAI(config = {}) {
     return new DefaultAIProvider(config);
 }
 
-// Export default shared instance
-export const ai = createAI();
+let activeAI = null;
+
+export function setActiveAI(aiInstance) {
+    activeAI = aiInstance;
+}
+
+export function getActiveAI() {
+    if (!activeAI) {
+        activeAI = createAI();
+    }
+    return activeAI;
+}
+
+// Export dynamic proxy that delegates to the active AI instance
+export const ai = new Proxy({}, {
+    get(target, prop) {
+        const instance = getActiveAI();
+        const value = instance[prop];
+        return typeof value === 'function' ? value.bind(instance) : value;
+    }
+});
 
 // Export classes for developers creating custom AI providers
 export { BaseAIProvider, DefaultAIProvider };
+
