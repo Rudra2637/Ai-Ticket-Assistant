@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { BaseStorageAdapter } from './base.storage.js';
-import { User } from '../models/user.js';
+import { User } from '../models/agent.js';
 import { Ticket } from '../models/ticket.js';
 
 /**

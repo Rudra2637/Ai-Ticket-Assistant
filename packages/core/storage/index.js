@@ -42,8 +42,26 @@ export function createStorage(config = {}) {
     return new MongoStorageAdapter(config);
 }
 
-// Export default shared instance
-export const storage = createStorage();
+let activeStorage = null;
+
+export function setActiveStorage(storageInstance) {
+    activeStorage = storageInstance;
+}
+
+export function getActiveStorage() {
+    if (!activeStorage) {
+        activeStorage = createStorage();
+    }
+    return activeStorage;
+}
+
+export const storage = new Proxy({}, {
+    get(target, prop) {
+        const instance = getActiveStorage();
+        const value = instance[prop];
+        return typeof value === 'function' ? value.bind(instance) : value;
+    }
+});
 
 // Export all adapter classes for developers who want to extend or import them directly
 export { BaseStorageAdapter, MongoStorageAdapter, SupabaseStorageAdapter };
