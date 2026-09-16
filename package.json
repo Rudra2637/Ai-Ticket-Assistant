@@ -5,12 +5,11 @@
   "packageManager": "npm@10.9.3",
   "type": "module",
   "workspaces": [
-    "backend",
-    "dashboard"
+    "packages/*"
   ],
   "scripts": {
     "dev": "turbo dev",
-    "dev:backend": "turbo dev --filter=@ticket-assistant/backend",
+    "dev:core": "turbo dev --filter=@ticket-assistant/core",
     "dev:dashboard": "turbo dev --filter=@ticket-assistant/dashboard",
     "build": "turbo build",
     "lint": "turbo lint"

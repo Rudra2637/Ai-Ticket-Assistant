@@ -1,0 +1,23 @@
+{
+    "name": "create-ticket-ai",
+    "version": "1.0.0",
+    "description": "Scaffold and initialize AI-powered support ticket assistant",
+    "type": "module",
+    "bin": {
+        "create-ticket-ai": "./bin/index.js",
+        "ticket-ai": "./bin/index.js"
+    },
+    "keywords": [
+        "ticket",
+        "support",
+        "ai",
+        "cli",
+        "create-ticket-ai",
+        "helpdesk"
+    ],
+    "dependencies": {
+        "@clack/prompts": "^1.7.0",
+        "fs-extra": "^11.4.0",
+        "picocolors": "^1.1.1"
+    }
+}
