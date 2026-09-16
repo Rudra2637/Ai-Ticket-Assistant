@@ -12,7 +12,7 @@ export const sendMail = async(to,subject,text) => {
             },
         });
         const info = await transporter.sendMail({
-            from: 'Ingest @no-reply',
+            from: 'AI Assistant @no-reply',
             to,
             subject,
             text, 
