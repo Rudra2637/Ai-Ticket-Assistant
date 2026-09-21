@@ -1,26 +1,38 @@
-import nodemailer from 'nodemailer'
+/**
+ * Send email notification using nodemailer.
+ * Lazy-loads nodemailer dynamically only if SMTP credentials are configured.
+ * Gracefully skips if unconfigured, without crashing the server or requiring nodemailer in serverless.
+ */
+export const sendMail = async (to, subject, text) => {
+    const host = process.env.MAILTRAP_SMTP_HOST || process.env.SMTP_HOST;
+    const user = process.env.MAILTRAP_SMTP_USER || process.env.SMTP_USER;
+    const pass = process.env.MAILTRAP_SMTP_PASS || process.env.SMTP_PASS;
+    const port = process.env.MAILTRAP_SMTP_PORT || process.env.SMTP_PORT || 2525;
 
-export const sendMail = async(to,subject,text) => {
+    // Skip silently if SMTP is not configured
+    if (!host || !user || !pass) {
+        return null;
+    }
+
     try {
+        const nodemailer = (await import('nodemailer')).default;
         const transporter = nodemailer.createTransport({
-            host: process.env.MAILTRAP_SMTP_HOST,
-            port: process.env.MAILTRAP_SMTP_PORT,
-            secure: false, // true for 465, false for other ports // During production,set it to true
-            auth: {
-                user: process.env.MAILTRAP_SMTP_USER,
-                pass: process.env.MAILTRAP_SMTP_PASS,
-            },
+            host,
+            port: Number(port),
+            secure: Number(port) === 465,
+            auth: { user, pass }
         });
+
         const info = await transporter.sendMail({
-            from: 'AI Assistant @no-reply',
+            from: process.env.MAIL_FROM || 'AI Ticket Assistant <no-reply@ticketai.dev>',
             to,
             subject,
-            text, 
-        })
-        console.log("Message sent:", info.messageId);
-        return info
+            text
+        });
+        console.log("[Mailer] Notification sent:", info.messageId);
+        return info;
     } catch (error) {
-        console.error("Error in sending mail ",error.message)
-        throw error
+        console.warn("[Mailer] Failed to send email notification:", error.message);
+        return null;
     }
-}
+};

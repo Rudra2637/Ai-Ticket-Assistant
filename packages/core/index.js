@@ -98,4 +98,6 @@ export * from './storage/base.storage.js';
 export * from './storage/mongo.storage.js';
 export * from './storage/supabase.storage.js';
 export * from './ai/base.ai.js';
-export * from './ai/default.ai.js';
+export * from './ai/default.ai.js';
+export { onticketCreate } from './utils/on-ticket-create.js';
+

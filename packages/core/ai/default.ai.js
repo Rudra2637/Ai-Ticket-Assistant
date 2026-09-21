@@ -1,10 +1,10 @@
-import { createAgent, openai } from '@inngest/agent-kit';
 import { BaseAIProvider } from './base.ai.js';
 
 /**
  * DefaultAIProvider
- * Built-in standard AI provider compatible with any OpenAI-compatible API
- * (Groq, OpenAI, Ollama, DeepSeek, Together AI, OpenRouter, etc.).
+ * Built-in standard AI provider using native fetch.
+ * Compatible with any OpenAI-compatible API (Groq, OpenAI, Ollama, DeepSeek, Together AI, OpenRouter, etc.).
+ * Zero external dependencies!
  */
 export class DefaultAIProvider extends BaseAIProvider {
     /**
@@ -12,13 +12,13 @@ export class DefaultAIProvider extends BaseAIProvider {
      */
     constructor(config = {}) {
         super();
-        this.apiKey = config.apiKey || process.env.AI_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
+        this.apiKey = config.apiKey || process.env.AI_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY;
         this.model = config.model || process.env.AI_MODEL || 'llama-3.3-70b-versatile';
         this.baseUrl = config.baseUrl || process.env.AI_BASE_URL || (process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY ? 'https://api.openai.com/v1' : 'https://api.groq.com/openai/v1');
     }
 
     /**
-     * Analyze ticket with active AI provider
+     * Analyze ticket with active AI provider using standard fetch
      * @param {Object} ticket - { title: string, description: string }
      */
     async analyzeTicket(ticket) {
@@ -27,55 +27,69 @@ export class DefaultAIProvider extends BaseAIProvider {
             return null;
         }
 
-        const supportAgent = createAgent({
-            model: openai({
-                model: this.model,
-                apiKey: this.apiKey || 'ollama',
-                baseUrl: this.baseUrl
-            }),
-            name: 'Ai Ticket Triage Assistant',
-            system: `You are an expert AI assistant that processes technical support tickets. 
-                Your job is to:
-                1. Summarize the issue.
-                2. Estimate its priority.
-                3. Provide helpful notes and resource links for human moderators.
-                4. List relevant technical skills required.
+        const systemPrompt = `You are an expert AI assistant that processes technical support tickets. 
+Your job is to:
+1. Summarize the issue.
+2. Estimate its priority: "low", "medium", or "high".
+3. Provide helpful notes and resource links for human moderators.
+4. List relevant technical skills required.
 
-                IMPORTANT:
-                - Respond with *only* valid raw JSON.
-                - Do NOT include markdown, code fences, comments, or any extra formatting.`
-        });
+Respond ONLY with a valid raw JSON object matching this structure:
+{
+  "summary": "Short 1-2 sentence summary of the ticket",
+  "priority": "high",
+  "helpfulNotes": "Technical explanation, troubleshooting steps, and useful links...",
+  "relatedSkills": ["React", "Node.js"]
+}
 
-        const prompt = `You are a ticket triage agent. Only return a strict JSON object with no extra text, headers, or markdown.
-            
-        Analyze the following support ticket and provide a JSON object with:
-        - summary: A short 1-2 sentence summary of the issue.
-        - priority: One of "low", "medium", or "high".
-        - helpfullNotes: A detailed technical explanation that a moderator can use to solve this issue. Include useful external links or resources if possible.
-        - relatedSkills: An array of relevant skills required to solve the issue (e.g., ["React", "MongoDB"]).
+Do NOT wrap in markdown, backticks, or code blocks. Return ONLY raw JSON.`;
 
-        Respond ONLY in this JSON format:
-        {
-          "summary": "Short summary of the ticket",
-          "priority": "high",
-          "helpfullNotes": "Here are useful tips...",
-          "relatedSkills": ["React", "Node.js"]
-        }
-
-        ---
-        Ticket information:
-        - Title: ${ticket.title}
-        - Description: ${ticket.description}`;
+        const userPrompt = `Ticket Information:
+- Title: ${ticket.title}
+- Description: ${ticket.description}`;
 
         try {
-            const response = await supportAgent.run(prompt);
-            const raw = response.output[0]?.content || '';
-            const match = raw.match(/```json\s*([\s\S]*?)\s*```/i);
-            const jsonString = match ? match[1] : raw.trim();
-            return JSON.parse(jsonString);
+            const endpoint = `${this.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ],
+                    temperature: 0.2
+                })
+            });
+
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`AI API error (${res.status}): ${errText}`);
+            }
+
+            const data = await res.json();
+            const rawContent = data.choices?.[0]?.message?.content || '';
+
+            // Extract JSON even if wrapped in markdown code blocks
+            const jsonMatch = rawContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            const jsonString = jsonMatch ? jsonMatch[1].trim() : rawContent.trim();
+
+            const parsed = JSON.parse(jsonString);
+
+            return {
+                summary: parsed.summary || '',
+                priority: parsed.priority || 'medium',
+                helpfulNotes: parsed.helpfulNotes || parsed.helpfullNotes || '',
+                relatedSkills: Array.isArray(parsed.relatedSkills) ? parsed.relatedSkills : []
+            };
         } catch (error) {
-            console.error("DefaultAIProvider: Failed to parse AI response: " + error.message);
+            console.error("[DefaultAIProvider] AI triage failed: " + error.message);
             return null;
         }
     }
 }
+
