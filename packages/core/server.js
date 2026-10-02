@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 const assistant = new TicketAssistant();
 await assistant.connect();
 
-app.use('/api', assistant.getRouter());
+app.use('/api', await assistant.getRouter());
 
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     app.listen(port, () => {

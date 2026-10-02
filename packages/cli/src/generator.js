@@ -80,7 +80,7 @@ const assistant = new TicketAssistant(config);
 await assistant.connect();
 
 // Mount TicketAI endpoints under /api (/api/tickets, /api/agents)
-app.use('/api', assistant.getRouter());
+app.use('/api', await assistant.getRouter());
 
 app.listen(port, () => {
     console.log(\`🚀 Ticket Assistant running on http://localhost:\${port}\`);
