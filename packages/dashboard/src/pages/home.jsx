@@ -1,23 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Tickets from './tickets'
 import LandingPage from './landing'
 
 export default function Home() {
+    const [token, setToken] = useState(() => localStorage.getItem("token"));
+
     useEffect(() => {
-        if (!localStorage.getItem("user")) {
-            localStorage.setItem("user", JSON.stringify({
-                _id: "dev-agent-id",
-                id: "dev-agent-id",
-                name: "Lead Support Agent",
-                email: "agent@ticketai.dev",
-                role: "admin",
-                skills: ["javascript", "react", "billing", "database"]
-            }));
-        }
-        if (!localStorage.getItem("token")) {
-            localStorage.setItem("token", "dev-bypass-token");
-        }
+        const checkToken = () => {
+            setToken(localStorage.getItem("token"));
+        };
+        window.addEventListener("storage", checkToken);
+        return () => window.removeEventListener("storage", checkToken);
     }, []);
+
+    if (!token) {
+        return <LandingPage />;
+    }
 
     return <Tickets />;
 }

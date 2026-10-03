@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import ThemeToggle from "../components/themeToggle";
 
+const API_URL = (import.meta.env.VITE_SERVER_URL || 'http://localhost:3000/api').trim();
+
 function TicketDetailsPage() {
     const { id } = useParams();
     const [ticket, setTicket] = useState(null);
@@ -22,7 +24,7 @@ function TicketDetailsPage() {
     const fetchTicket = async () => {
         try {
             const res = await fetch(
-                `${import.meta.env.VITE_SERVER_URL}/tickets/${id}`,
+                `${API_URL}/tickets/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

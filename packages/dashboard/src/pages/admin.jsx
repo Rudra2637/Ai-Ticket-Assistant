@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ThemeToggle from "../components/themeToggle"
 
+const API_URL = (import.meta.env.VITE_SERVER_URL || 'http://localhost:3000/api').trim();
+
 function Admin() {
     const [moderators, setModerators] = useState([]);
     const [filteredModerators, setFilteredModerators] = useState([]);
@@ -30,7 +32,7 @@ function Admin() {
 
     const fetchModerators = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/agents`, {
+            const res = await fetch(`${API_URL}/agents`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -74,7 +76,7 @@ function Admin() {
         setModError("");
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/agents`, {
+            const res = await fetch(`${API_URL}/agents`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

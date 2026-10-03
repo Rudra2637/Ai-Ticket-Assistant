@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/themeToggle";
 
+const API_URL = (import.meta.env.VITE_SERVER_URL || 'http://localhost:3000/api').trim();
+
 function Tickets() {
     const [form, setForm] = useState({ title: "", description: "" });
     const [tickets, setTickets] = useState([]);
@@ -29,7 +31,7 @@ function Tickets() {
 
     const fetchTickets = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
+            const res = await fetch(`${API_URL}/tickets`, {
                 headers: { Authorization: `Bearer ${token}` },
                 method: "GET",
             });
@@ -73,7 +75,7 @@ function Tickets() {
         if (!form.title.trim() || !form.description.trim()) return;
         setLoading(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
+            const res = await fetch(`${API_URL}/tickets`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -114,20 +116,20 @@ function Tickets() {
     const saveModeratorProfile = async () => {
         setUpdatingProfile(true);
         try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/update-User`, {
-                method: "POST",
+            const agentId = currentUser?._id || currentUser?.id;
+            const res = await fetch(`${API_URL}/agents/${agentId}`, {
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    email: currentUser?.email,
                     skills: moderatorSkills
                 })
             });
             const data = await res.json();
             if (res.ok) {
-                const updated = data.user || { ...currentUser, skills: moderatorSkills };
+                const updated = data.agent || data.user || { ...currentUser, skills: moderatorSkills };
                 setCurrentUser(updated);
                 localStorage.setItem("user", JSON.stringify(updated));
                 setShowProfileModal(false);
@@ -145,7 +147,7 @@ function Tickets() {
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        navigate("/");
+        navigate("/login");
     };
 
     return (
@@ -393,9 +395,9 @@ function Tickets() {
 
                                 return (
                                     <Link
-                                        key={ticket._id}
+                                        key={ticket._id || ticket.id}
                                         className="p-5 rounded-2xl app-card app-card-hover flex flex-col justify-between h-48"
-                                        to={`/ticket/${ticket._id}`}
+                                        to={`/ticket/${ticket._id || ticket.id}`}
                                     >
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between gap-2">
