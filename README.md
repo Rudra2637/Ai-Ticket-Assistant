@@ -74,8 +74,8 @@ export const assistant = new TicketAssistant({
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
   supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   ai: {
-    apiKey: process.env.GROQ_API_KEY, // or OPENAI_API_KEY
-    model: 'openai/gpt-oss-20b'       // or 'gpt-4o-mini'
+    apiKey: process.env.GEMINI_API_KEY, // or GROQ_API_KEY, OPENAI_API_KEY
+    model: 'gemini-2.0-flash'          // or whatever model you choose
   }
 });
 ```
@@ -203,10 +203,18 @@ MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-service-role-key
 
-# AI Configuration (Groq, OpenAI, etc.)
-GROQ_API_KEY=gsk_...
-# OR
-OPENAI_API_KEY=sk-...
+# AI Configuration (Gemini, Groq, OpenAI, DeepSeek, etc.)
+# 1. Google Gemini:
+GEMINI_API_KEY=AIzaSy...
+AI_MODEL=gemini-2.0-flash
+
+# OR 2. Groq:
+# GROQ_API_KEY=gsk_...
+# AI_MODEL=openai/gpt-oss-20b
+
+# OR 3. OpenAI:
+# OPENAI_API_KEY=sk-...
+# AI_MODEL=gpt-4o-mini
 
 # Optional SMTP for Notifications
 SMTP_HOST=smtp.mailtrap.io

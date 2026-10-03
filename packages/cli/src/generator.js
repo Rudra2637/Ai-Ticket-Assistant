@@ -15,35 +15,39 @@ function getConfigContent(dbChoice, aiChoice) {
         gemini: 'GEMINI_API_KEY'
     };
 
-    const dbOptions = dbChoice === 'mongo'
-        ? 'url: process.env.MONGODB_URI || process.env.DATABASE_URL'
-        : 'url: process.env.SUPABASE_URL,\n      key: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY';
+    const aiModelMap = {
+        groq: 'openai/gpt-oss-20b',
+        openai: 'gpt-4o-mini',
+        gemini: 'gemini-2.0-flash'
+    };
+
+    const storageConfig = dbChoice === 'mongo'
+        ? `storage: {
+    provider: 'mongo',
+    mongoUri: process.env.MONGODB_URI || process.env.DATABASE_URL
+  },`
+        : `storage: {
+    provider: 'supabase',
+    supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY
+  },`;
 
     return `import { defineConfig } from '@ticket-assistant/core';
 
 export default defineConfig({
-  storage: {
-    provider: '${dbChoice}',
-    options: {
-      ${dbOptions}
-    }
-  },
+  ${storageConfig}
   ai: {
     provider: '${aiChoice}',
-    options: {
-      apiKey: process.env.${aiKeyMap[aiChoice] || 'AI_API_KEY'}
-    }
+    apiKey: process.env.${aiKeyMap[aiChoice] || 'AI_API_KEY'},
+    model: process.env.AI_MODEL || '${aiModelMap[aiChoice] || 'gemini-2.0-flash'}'
   },
-  auth: {
-    // 1. Customer auth: users creating & viewing their tickets
-    middleware: (req, res, next) => next(),
-
-    // 2. Agent auth: staff updating ticket status & responses
-    agentMiddleware: (req, res, next) => next(),
-
-    // 3. Admin auth: staff managing agent roster
-    adminMiddleware: (req, res, next) => next()
-  }
+  agents: [
+    {
+      name: 'Lead Support Specialist',
+      email: 'support@example.com',
+      skills: ['General', 'Technical', 'Account', 'Billing']
+    }
+  ]
 });
 `;
 }

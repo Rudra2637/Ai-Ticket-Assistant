@@ -26,34 +26,91 @@ npm install express cors
 
 ### 1. Direct Programmatic API (Next.js, Remix, Serverless)
 
-Use OpenDesk directly within web-standard API route handlers without needing an Express server:
+Use OpenDesk directly within web-standard API route handlers without needing an Express server.
 
+#### Step A: Configure `next.config.ts`
+Add `@ticket-assistant/core` to `serverExternalPackages` so Next.js treats it as a backend server module:
 ```typescript
-import { TicketAssistant } from '@ticket-assistant/core';
+// next.config.ts
+const nextConfig = {
+  serverExternalPackages: ['@ticket-assistant/core'],
+};
+export default nextConfig;
+```
 
-// Initialize the assistant instance (singleton recommended)
-export const assistant = new TicketAssistant({
-  storage: 'supabase', // or 'mongo'
-  supabaseUrl: process.env.SUPABASE_URL,
-  supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+#### Step B: Create `ticket.config.js`
+```javascript
+// ticket.config.js
+import { defineConfig } from '@ticket-assistant/core';
+
+export default defineConfig({
+  storage: {
+    provider: 'supabase', // or 'mongo'
+    supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY
+  },
   ai: {
-    apiKey: process.env.GROQ_API_KEY, // or OPENAI_API_KEY
-    model: 'openai/gpt-oss-20b'       // or 'gpt-4o-mini'
+    apiKey: process.env.GEMINI_API_KEY || process.env.GROQ_API_KEY,
+    model: process.env.AI_MODEL || 'gemini-2.0-flash'
+  },
+  agents: [
+    {
+      name: 'Global Support Lead',
+      email: 'support@mycompany.com',
+      skills: ['Payments', 'Billing', 'Account', 'Technical']
+    }
+  ]
+});
+```
+
+#### Step C: Create the Singleton Helper (`src/lib/ticket-assistant.ts`)
+```typescript
+// src/lib/ticket-assistant.ts
+import { TicketAssistant } from '@ticket-assistant/core';
+import config from '../../ticket.config.js';
+
+let assistantInstance: TicketAssistant | null = null;
+let seeded = false;
+
+export function getTicketAssistant(): TicketAssistant {
+  if (!assistantInstance) {
+    assistantInstance = new TicketAssistant(config);
   }
-});
+  return assistantInstance;
+}
 
-// Create a new support ticket (triggers async AI triage automatically)
-const ticket = await assistant.createTicket({
-  title: "Cannot reset password via email",
-  description: "When clicking the reset link in the email, it shows a 404 token expired error.",
-  createdBy: "usr_123456"
-});
+export async function ensureAgentsSeeded() {
+  if (seeded) return;
+  const assistant = getTicketAssistant();
+  await assistant.seedAgents();
+  seeded = true;
+}
+```
 
-// Fetch tickets with optional status or assignment filtering
-const openTickets = await assistant.getTickets({ status: "TODO" });
+#### Step D: Route Handlers (`src/app/api/support/tickets/route.ts`)
+```typescript
+import { NextResponse } from 'next/server';
+import { getTicketAssistant, ensureAgentsSeeded } from '@/lib/ticket-assistant';
 
-// Fetch matching support agents
-const agents = await assistant.getAgents();
+export async function GET() {
+  await ensureAgentsSeeded();
+  const assistant = getTicketAssistant();
+  const tickets = await assistant.getTickets();
+  return NextResponse.json(tickets);
+}
+
+export async function POST(req: Request) {
+  await ensureAgentsSeeded();
+  const assistant = getTicketAssistant();
+  const { title, description } = await req.json();
+
+  const ticket = await assistant.createTicket({
+    title,
+    description
+  });
+
+  return NextResponse.json(ticket, { status: 201 });
+}
 ```
 
 ---
@@ -155,29 +212,36 @@ Mongoose automatically manages `ticketai_tickets` and `ticketai_agents` schemas.
 
 ---
 
-## 🤖 AI Providers
+## 🤖 AI Providers & Model Configuration
 
-OpenDesk supports any OpenAI-compatible completions API using native zero-dependency HTTP `fetch`:
+OpenDesk supports any OpenAI-compatible completions API using native zero-dependency HTTP `fetch`. The provider endpoint is automatically resolved from your environment variables:
 
 ```javascript
-// Example: Using Groq (default for ultra-fast <500ms triage)
+// Example 1: Google Gemini (automatic endpoint resolution)
+const assistant = new TicketAssistant({
+  ai: {
+    apiKey: process.env.GEMINI_API_KEY,
+    model: 'gemini-2.0-flash' // or 'gemini-1.5-flash', 'gemini-1.5-pro'
+  }
+});
+
+// Example 2: Groq (high-speed inference)
 const assistant = new TicketAssistant({
   ai: {
     apiKey: process.env.GROQ_API_KEY,
-    model: 'openai/gpt-oss-20b'
+    model: 'openai/gpt-oss-20b' // or 'qwen/qwen3.8-27b'
   }
 });
 
-// Example: Using OpenAI
+// Example 3: OpenAI
 const assistant = new TicketAssistant({
   ai: {
     apiKey: process.env.OPENAI_API_KEY,
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o-mini'
+    model: 'gpt-4o-mini' // or 'gpt-4o'
   }
 });
 
-// Example: Local Ollama
+// Example 4: Local Ollama / Custom vLLM
 const assistant = new TicketAssistant({
   ai: {
     baseUrl: 'http://localhost:11434/v1',
@@ -185,6 +249,8 @@ const assistant = new TicketAssistant({
   }
 });
 ```
+
+> **Note**: OpenDesk never hardcodes default AI models. You can use any model supported by your provider by supplying `model` in your configuration or `AI_MODEL` in your environment.
 
 ---
 

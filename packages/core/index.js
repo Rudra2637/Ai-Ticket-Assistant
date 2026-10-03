@@ -87,6 +87,24 @@ export class TicketAssistant {
         return this.storage.deleteAgent(id);
     }
 
+    /**
+     * Seeds initial agents defined in config.agents.
+     * Idempotent: Checks if agent already exists by email before inserting.
+     */
+    async seedAgents() {
+        if (!Array.isArray(this.config.agents)) return [];
+        const seeded = [];
+        for (const agentData of this.config.agents) {
+            if (!agentData?.email) continue;
+            const existing = await this.getAgentByEmail(agentData.email);
+            if (!existing) {
+                const created = await this.createAgent(agentData);
+                seeded.push(created);
+            }
+        }
+        return seeded;
+    }
+
     // ==========================================================
     // Express Adapter (Lazy-Loaded: Express is only loaded on demand)
     // ==========================================================
