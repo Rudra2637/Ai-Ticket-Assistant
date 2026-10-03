@@ -13,8 +13,8 @@ export class DefaultAIProvider extends BaseAIProvider {
     constructor(config = {}) {
         super();
         this.apiKey = config.apiKey || process.env.AI_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY;
-        this.model = config.model || process.env.AI_MODEL || 'llama-3.3-70b-versatile';
         this.baseUrl = config.baseUrl || process.env.AI_BASE_URL || (process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY ? 'https://api.openai.com/v1' : 'https://api.groq.com/openai/v1');
+        this.model = config.model || process.env.AI_MODEL || (this.baseUrl.includes('groq.com') ? 'openai/gpt-oss-20b' : 'gpt-4o-mini');
     }
 
     /**
