@@ -11,6 +11,17 @@
     "./*": "./*"
   },
   "type": "module",
+  "files": [
+    "index.js",
+    "ai",
+    "controllers",
+    "middlewares",
+    "models",
+    "routes",
+    "storage",
+    "utils",
+    "README.md"
+  ],
   "scripts": {
     "dev": "nodemon server.js"
   },
