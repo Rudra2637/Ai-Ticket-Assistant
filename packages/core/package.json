@@ -1,6 +1,6 @@
 {
   "name": "@ticket-assistant/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./index.js",
   "types": "./index.d.ts",
   "publishConfig": {
@@ -41,9 +41,18 @@
     "helpdesk",
     "triage"
   ],
-  "author": "",
+  "author": "Rudra",
   "license": "ISC",
   "description": "Headless, AI-powered support ticket triage and assignment framework",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rudra2637/Ai-Ticket-Assistant.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Rudra2637/Ai-Ticket-Assistant/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/Rudra2637/Ai-Ticket-Assistant/issues"
+  },
   "peerDependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.0 || ^5.0.0"
