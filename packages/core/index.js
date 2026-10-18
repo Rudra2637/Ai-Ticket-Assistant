@@ -1,6 +1,7 @@
 import { createAI, setActiveAI } from './ai/index.js';
 import { createStorage, setActiveStorage } from './storage/index.js';
 import { onticketCreate } from './utils/on-ticket-create.js';
+import { hashPassword, verifyPassword } from './utils/crypto.js';
 
 /**
  * Config helper — like Vite's defineConfig
@@ -68,15 +69,36 @@ export class TicketAssistant {
     }
 
     async createAgent(data) {
-        return this.storage.createAgent(data);
+        const agentData = { ...data };
+        if (agentData.password) {
+            agentData.passwordHash = hashPassword(agentData.password);
+            delete agentData.password;
+        }
+        return this.storage.createAgent(agentData);
     }
 
     async getAgents() {
         return this.storage.getAgents();
     }
 
-    async getAgentByEmail(email) {
-        return this.storage.getAgentByEmail(email);
+    async getAgentByEmail(email, options = {}) {
+        return this.storage.getAgentByEmail(email,options);
+    }
+
+    /**
+     * Verifies agent credentials against stored password hash.
+     * Returns the agent object (without passwordHash) on success, or null on failure.
+     */
+    async verifyAgentCredentials(email, password) {
+        if (!email || !password) return null;
+        const agent = await this.storage.getAgentByEmail(email, { includePassword: true });
+        if (!agent || !agent.passwordHash) return null;
+        const isValid = verifyPassword(password, agent.passwordHash);
+        if (!isValid) return null;
+        const safeAgent = { ...agent };
+        delete safeAgent.passwordHash;
+        delete safeAgent.password_hash;
+        return safeAgent;
     }
 
     async updateAgent(id, updates) {
@@ -92,13 +114,14 @@ export class TicketAssistant {
      * Idempotent: Checks if agent already exists by email before inserting.
      */
     async seedAgents() {
-        if (!Array.isArray(this.config.agents)) return [];
+        if (!Array.isArray(this.config.agents) || !this.config.agents.length) return [];
         const seeded = [];
         for (const agentData of this.config.agents) {
             if (!agentData?.email) continue;
             const existing = await this.getAgentByEmail(agentData.email);
             if (!existing) {
                 const created = await this.createAgent(agentData);
+                console.log(`  ✅ Seeded agent: ${agentData.email}`);
                 seeded.push(created);
             }
         }
@@ -136,21 +159,7 @@ export class TicketAssistant {
         return router;
     }
 
-    /**
-     * Seed agents from config on first boot.
-     * Only inserts agents that don't already exist.
-     */
-    async seedAgents() {
-        if (!this.config.agents?.length) return;
 
-        for (const agentData of this.config.agents) {
-            const existing = await this.storage.getAgentByEmail(agentData.email);
-            if (!existing) {
-                await this.storage.createAgent(agentData);
-                console.log(`  ✅ Seeded agent: ${agentData.email}`);
-            }
-        }
-    }
 
     async startServer(options = {}) {
         await this.connect();
@@ -191,5 +200,6 @@ export * from './storage/supabase.storage.js';
 export * from './ai/base.ai.js';
 export * from './ai/default.ai.js';
 export { onticketCreate } from './utils/on-ticket-create.js';
+export { hashPassword, verifyPassword } from './utils/crypto.js';
 
-
+

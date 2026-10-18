@@ -44,11 +44,18 @@ export class MongoStorageAdapter extends BaseStorageAdapter {
 
     async createAgent(agentData) {
         const agent = await Agent.create(agentData);
-        return agent.toObject();
+        const obj = agent.toObject()
+        delete obj.passwordHash;
+        return obj;
     }
 
-    async getAgentByEmail(email) {
-        const agent = await Agent.findOne({ email });
+    async getAgentByEmail(email, options = {}) {
+        let query = Agent.findOne({ email });
+        if (options.includePassword) {
+            query = query.select('+passwordHash');
+        }
+
+        const agent = await query;
         return agent ? agent.toObject() : null;
     }
 

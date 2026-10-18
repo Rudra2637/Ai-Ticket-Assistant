@@ -104,6 +104,9 @@ CREATE TABLE IF NOT EXISTS ticketai_agents (
     email TEXT UNIQUE NOT NULL,
     name TEXT,
     skills TEXT[] DEFAULT '{}',
+    password_hash TEXT,
+    auth_provider_id TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

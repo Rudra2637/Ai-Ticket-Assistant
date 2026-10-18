@@ -44,6 +44,9 @@ CREATE TABLE IF NOT EXISTS ticketai_agents (
     email TEXT UNIQUE NOT NULL,
     name TEXT,
     skills TEXT[] DEFAULT '{}',
+    password_hash TEXT,
+    auth_provider_id TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -74,7 +77,10 @@ CREATE TABLE IF NOT EXISTS ticketai_tickets (
         const payload = {
             email: agentData.email,
             name: agentData.name || null,
-            skills: Array.isArray(agentData.skills) ? agentData.skills : []
+            skills: Array.isArray(agentData.skills) ? agentData.skills : [],
+            password_hash: agentData.passwordHash || null,
+            auth_provider_id: agentData.authProviderId || null,
+            metadata: agentData.metadata || {}
         };
 
         const { data, error } = await this.supabase
@@ -87,7 +93,7 @@ CREATE TABLE IF NOT EXISTS ticketai_tickets (
         return this._formatAgent(data);
     }
 
-    async getAgentByEmail(email) {
+    async getAgentByEmail(email, options = {}) {
         const { data, error } = await this.supabase
             .from('ticketai_agents')
             .select('*')
@@ -95,7 +101,7 @@ CREATE TABLE IF NOT EXISTS ticketai_tickets (
             .maybeSingle();
 
         if (error) throw error;
-        return data ? this._formatAgent(data) : null;
+        return data ? this._formatAgent(data, options) : null;
     }
 
     async getAgentById(id) {
@@ -133,6 +139,9 @@ CREATE TABLE IF NOT EXISTS ticketai_tickets (
         if (updates.name !== undefined) payload.name = updates.name;
         if (updates.email !== undefined) payload.email = updates.email;
         if (updates.skills !== undefined) payload.skills = Array.isArray(updates.skills) ? updates.skills : [];
+        if (updates.passwordHash !== undefined) payload.password_hash = updates.passwordHash;
+        if (updates.authProviderId !== undefined) payload.auth_provider_id = updates.authProviderId;
+        if (updates.metadata !== undefined) payload.metadata = updates.metadata;
 
         const { data, error } = await this.supabase
             .from('ticketai_agents')
@@ -259,13 +268,23 @@ CREATE TABLE IF NOT EXISTS ticketai_tickets (
     // FORMATTING HELPERS
     // ==========================================
 
-    _formatAgent(agent) {
+    _formatAgent(agent, options = {}) {
         if (!agent) return null;
-        return {
+        const formatted = {
             ...agent,
             _id: agent.id,
-            id: agent.id
+            id: agent.id,
+            passwordHash: agent.password_hash || agent.passwordHash || null,
+            authProviderId: agent.auth_provider_id || agent.authProviderId || null,
+            metadata: agent.metadata || {}
         };
+
+        if (!options.includePassword) {
+            delete formatted.password_hash;
+            delete formatted.passwordHash;
+        }
+
+        return formatted;
     }
 
     _formatTicket(ticket) {

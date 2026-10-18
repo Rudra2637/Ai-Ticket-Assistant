@@ -8,6 +8,18 @@ const agentSchema = new mongoose.Schema({
     },
     name: String,
     skills: [String],
+    passwordHash: {
+        type:String,
+        select:false
+    },
+    authProviderId: {
+        type: String,
+        default: null
+    },
+    metadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
     createdAt: {
         type: Date,
         default: Date.now
