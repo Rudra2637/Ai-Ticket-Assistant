@@ -1,4 +1,4 @@
-#  OpenDesk
+#  Ticket Assistant
 
 > **The headless, embeddable, AI-powered support ticket triage and routing framework.**  
 > *An open-source, developer-first alternative to Zendesk.*
@@ -7,7 +7,7 @@
 [![npm version](https://img.shields.io/npm/v/@ticket-assistant/core.svg)](https://www.npmjs.com/package/@ticket-assistant/core)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-**OpenDesk** gives developers a drop-in customer support ticketing system with automatic AI issue triage, intelligent skill-based agent routing, and SLA prioritization. It embeds directly into your existing stack without forcing a separate authentication database or complex external queue infrastructure.
+**Ticket Assistant** gives developers a drop-in customer support ticketing system with automatic AI issue triage, intelligent skill-based agent routing, and SLA prioritization. It embeds directly into your existing stack without forcing a separate authentication database or complex external queue infrastructure.
 
 ---
 
@@ -35,7 +35,7 @@
 
 ##  Quickstart with CLI
 
-The fastest way to get started is with the OpenDesk CLI:
+The fastest way to get started is with the Ticket Assistant CLI:
 
 ### Option A: Initialize inside an existing codebase
 ```bash
@@ -63,7 +63,7 @@ npm install @ticket-assistant/core
 
 ### 2. Next.js (App Router) Integration
 
-OpenDesk works natively with Next.js web-standard `Request` / `Response` without requiring Express:
+Ticket Assistant works natively with Next.js web-standard `Request` / `Response` without requiring Express:
 
 ```typescript
 // lib/ticket.ts
@@ -129,7 +129,7 @@ export async function POST(req: Request) {
 
 ### 3. Express.js Integration
 
-Attach OpenDesk routes and middleware directly to your Express app:
+Attach Ticket Assistant routes and middleware directly to your Express app:
 
 ```javascript
 import express from 'express';
@@ -154,7 +154,7 @@ await assistant.connect();
 app.use('/api', await assistant.getRouter());
 
 app.listen(3000, () => {
-  console.log(' OpenDesk server running on http://localhost:3000');
+  console.log(' Ticket Assistant server running on http://localhost:3000');
 });
 ```
 
@@ -162,7 +162,7 @@ app.listen(3000, () => {
 
 ## 🗄️ Database Setup
 
-OpenDesk prefixes all tables with `ticketai_*` so it never collides with your existing database schema.
+Ticket Assistant prefixes all tables with `ticketai_*` so it never collides with your existing database schema.
 
 ### MongoDB
 No manual migrations needed! Mongoose automatically creates:
@@ -207,7 +207,7 @@ CREATE INDEX IF NOT EXISTS idx_ticketai_tickets_status ON ticketai_tickets(statu
 CREATE INDEX IF NOT EXISTS idx_ticketai_tickets_assigned_to ON ticketai_tickets(assigned_to);
 ```
 
-> **Note on RLS**: In production, use your Supabase `SUPABASE_SERVICE_ROLE_KEY` with OpenDesk backend operations to bypass row-level policies securely.
+> **Note on RLS**: In production, use your Supabase `SUPABASE_SERVICE_ROLE_KEY` with Ticket Assistant backend operations to bypass row-level policies securely.
 
 ---
 
@@ -261,4 +261,4 @@ Visit **`http://localhost:5173`** to access the live dashboard panel.
 
 ## 📄 License
 
-ISC License &copy; 2026 OpenDesk Contributors.
+ISC License &copy; 2026 Ticket Assistant Contributors.

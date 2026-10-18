@@ -2,8 +2,16 @@
   "name": "@ticket-assistant/core",
   "version": "1.0.0",
   "main": "./index.js",
+  "types": "./index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.js"
+    },
     "./storage": "./storage/index.js",
     "./ai": "./ai/index.js",
     "./utils/*": "./utils/*.js",
@@ -13,6 +21,7 @@
   "type": "module",
   "files": [
     "index.js",
+    "index.d.ts",
     "ai",
     "controllers",
     "middlewares",

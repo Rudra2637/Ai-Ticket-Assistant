@@ -1,4 +1,4 @@
-# @ticket-assistant/core (OpenDesk Core)
+# @ticket-assistant/core (Ticket Assistant Core)
 
 > **Headless, embeddable, AI-powered support ticket triage and routing framework.**
 
@@ -26,7 +26,7 @@ npm install express cors
 
 ### 1. Direct Programmatic API (Next.js, Remix, Serverless)
 
-Use OpenDesk directly within web-standard API route handlers without needing an Express server.
+Use Ticket Assistant directly within web-standard API route handlers without needing an Express server.
 
 #### Step A: Configure `next.config.ts`
 Add `@ticket-assistant/core` to `serverExternalPackages` so Next.js treats it as a backend server module:
@@ -146,7 +146,7 @@ if (!verifiedAgent) {
 
 ### 2. Express Server Integration
 
-If you run an Express backend, OpenDesk includes a pre-configured lazy-loaded router:
+If you run an Express backend, Ticket Assistant includes a pre-configured lazy-loaded router:
 
 ```javascript
 import express from 'express';
@@ -192,7 +192,7 @@ app.listen(3000, () => console.log('Support API running on port 3000'));
 
 ## 🗄️ Storage Proxies
 
-OpenDesk isolates all data using namespaced tables (`ticketai_*`), ensuring zero interference with your app's existing schema.
+Ticket Assistant isolates all data using namespaced tables (`ticketai_*`), ensuring zero interference with your app's existing schema.
 
 ### Supabase (PostgreSQL)
 ```javascript
@@ -246,7 +246,7 @@ Mongoose automatically manages `ticketai_tickets` and `ticketai_agents` schemas.
 
 ## 🤖 AI Providers & Model Configuration
 
-OpenDesk supports any OpenAI-compatible completions API using native zero-dependency HTTP `fetch`. The provider endpoint is automatically resolved from your environment variables:
+Ticket Assistant supports any OpenAI-compatible completions API using native zero-dependency HTTP `fetch`. The provider endpoint is automatically resolved from your environment variables:
 
 ```javascript
 // Example 1: Google Gemini (automatic endpoint resolution)
@@ -282,7 +282,7 @@ const assistant = new TicketAssistant({
 });
 ```
 
-> **Note**: OpenDesk never hardcodes default AI models. You can use any model supported by your provider by supplying `model` in your configuration or `AI_MODEL` in your environment.
+> **Note**: Ticket Assistant never hardcodes default AI models. You can use any model supported by your provider by supplying `model` in your configuration or `AI_MODEL` in your environment.
 
 ---
 
@@ -305,4 +305,4 @@ const assistant = new TicketAssistant({
 
 ## 📄 License
 
-ISC License &copy; 2026 OpenDesk Contributors.
+ISC License &copy; 2026 Ticket Assistant Contributors.

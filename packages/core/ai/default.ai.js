@@ -82,17 +82,17 @@ export class DefaultAIProvider extends BaseAIProvider {
      */
     async analyzeTicket(ticket) {
         if (!this.model) {
-            console.warn("[OpenDesk AI] No AI model specified. Please specify 'model' in your config (e.g. { ai: { model: 'gemini-1.5-flash' } }) or set AI_MODEL in your .env. Skipping AI triage.");
+            console.warn("[Ticket Assistant AI] No AI model specified. Please specify 'model' in your config (e.g. { ai: { model: 'gemini-1.5-flash' } }) or set AI_MODEL in your .env. Skipping AI triage.");
             return null;
         }
 
         if (!this.baseUrl) {
-            console.warn("[OpenDesk AI] No AI provider or baseUrl resolved. Please specify 'provider' (e.g. 'gemini', 'groq', 'openai') or 'baseUrl' in your config. Skipping AI triage.");
+            console.warn("[Ticket Assistant AI] No AI provider or baseUrl resolved. Please specify 'provider' (e.g. 'gemini', 'groq', 'openai') or 'baseUrl' in your config. Skipping AI triage.");
             return null;
         }
 
         if (!this.apiKey && !this.baseUrl.includes('localhost') && !this.baseUrl.includes('127.0.0.1')) {
-            console.warn(`[OpenDesk AI] No API key found for provider "${this.provider}". Skipping AI triage.`);
+            console.warn(`[Ticket Assistant AI] No API key found for provider "${this.provider}". Skipping AI triage.`);
             return null;
         }
 
@@ -156,8 +156,8 @@ Do NOT wrap in markdown, backticks, or code blocks. Return ONLY raw JSON.`;
                 relatedSkills: Array.isArray(parsed.relatedSkills) ? parsed.relatedSkills : []
             };
         } catch (error) {
-            console.error(`[OpenDesk AI] Triage failed: ${error.message}`);
-            console.error(`[OpenDesk AI] Diagnostics -> Endpoint: ${this.baseUrl} | Model: ${this.model} | Provider: ${this.provider}`);
+            console.error(`[Ticket Assistant AI] Triage failed: ${error.message}`);
+            console.error(`[Ticket Assistant AI] Diagnostics -> Endpoint: ${this.baseUrl} | Model: ${this.model} | Provider: ${this.provider}`);
             return null;
         }
     }

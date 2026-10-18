@@ -1,6 +1,6 @@
-# create-ticket-ai (OpenDesk CLI)
+# create-ticket-ai (Ticket Assistant CLI)
 
-> **Interactive CLI to scaffold or integrate OpenDesk into your application in seconds.**
+> **Interactive CLI to scaffold or integrate Ticket Assistant into your application in seconds.**
 
 [![npm version](https://img.shields.io/npm/v/create-ticket-ai.svg)](https://www.npmjs.com/package/create-ticket-ai)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
@@ -11,7 +11,7 @@
 
 ### 1. Initialize inside an Existing Project (`init` mode)
 
-Add OpenDesk customer support to your existing Next.js, Express, or Node.js codebase:
+Add Ticket Assistant customer support to your existing Next.js, Express, or Node.js codebase:
 
 ```bash
 cd my-existing-project
@@ -58,4 +58,4 @@ npx create-ticket-ai my-support-app --template=express --storage=supabase --ai=g
 
 ## 📄 License
 
-ISC License &copy; 2026 OpenDesk Contributors.
+ISC License &copy; 2026 Ticket Assistant Contributors.
