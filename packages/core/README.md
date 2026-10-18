@@ -113,6 +113,35 @@ export async function POST(req: Request) {
 }
 ```
 
+#### Step E: Agent Authentication (Next.js / NextAuth / Server Actions)
+
+You can create agents with passwords (auto-hashed using zero-dependency built-in crypto) and verify credentials directly in Next.js Server Actions, Route Handlers, or NextAuth / Auth.js:
+
+```typescript
+import { getTicketAssistant } from '@/lib/ticket-assistant';
+
+const assistant = getTicketAssistant();
+
+// 1. Register an agent with a password (auto-hashed with scrypt)
+const agent = await assistant.createAgent({
+  email: 'support@mycompany.com',
+  name: 'Alex Johnson',
+  password: 'SuperSecretPassword123!',
+  skills: ['billing', 'technical']
+});
+
+// 2. Verify credentials in your login route or NextAuth authorize callback:
+const verifiedAgent = await assistant.verifyAgentCredentials(
+  'support@mycompany.com',
+  'SuperSecretPassword123!'
+);
+
+if (!verifiedAgent) {
+  throw new Error('Invalid email or password');
+}
+// Returns safe agent object with id, email, name, skills (password hash stripped)
+```
+
 ---
 
 ### 2. Express Server Integration
@@ -181,6 +210,9 @@ CREATE TABLE IF NOT EXISTS ticketai_agents (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   skills TEXT[] DEFAULT '{}',
+  password_hash TEXT,
+  auth_provider_id TEXT,
+  metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

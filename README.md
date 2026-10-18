@@ -17,7 +17,7 @@
 *  **Skill-Based Agent Routing**: Automatically matches incoming tickets to the support agent with the highest skill overlap.
 * 🔌 **Pluggable Storage**: First-class support for **MongoDB** (Mongoose) and **Supabase** (PostgreSQL) using namespaced `ticketai_*` tables.
 *  **Universal Engine**: Works natively in **Next.js (App Router)**, **Express.js**, Remix, or pure serverless runtimes.
-*  **Headless & Auth-Agnostic**: Zero forced `User` tables or password schemes. Adapts to your existing auth (Clerk, Supabase Auth, NextAuth / Auth.js, Firebase, or custom JWT).
+* 🔐 **Batteries-Included, Auth-Agnostic**: Built-in zero-dependency password hashing & credential verification (`verifyAgentCredentials`), while staying 100% compatible with Clerk, Supabase Auth, NextAuth / Auth.js, Firebase, or custom JWT.
 *  **Zero Queue Lock-in**: Powered by a lightweight native async engine—no Redis or third-party queue services required for local or serverless deployment.
 * 🤖 **Bring Your Own AI**: Native support for **Groq** (ultra-fast 200ms triage), **OpenAI**, **Gemini**, **DeepSeek**, or local **Ollama** models.
 
@@ -106,6 +106,23 @@ export async function POST(req: Request) {
 
   return NextResponse.json(ticket, { status: 201 });
 }
+```typescript
+// app/api/agent/login/route.ts (Agent Credential Verification)
+import { NextResponse } from 'next/server';
+import { assistant } from '@/lib/ticket';
+
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
+
+  // Verifies password against stored scrypt hash in constant time
+  const agent = await assistant.verifyAgentCredentials(email, password);
+  if (!agent) {
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  }
+
+  // Returns safe agent object (password hash stripped)
+  return NextResponse.json({ message: "Login successful", agent });
+}
 ```
 
 ---
@@ -162,6 +179,9 @@ CREATE TABLE IF NOT EXISTS ticketai_agents (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   skills TEXT[] DEFAULT '{}',
+  password_hash TEXT,
+  auth_provider_id TEXT,
+  metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

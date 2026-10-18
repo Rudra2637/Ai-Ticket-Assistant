@@ -28,10 +28,6 @@ export class TicketAssistant {
         }
     }
 
-    // ==========================================================
-    // Direct Core API (Pure JS / Next.js / Serverless Friendly)
-    // ==========================================================
-
     /**
      * Create a ticket, save to storage, and automatically trigger background AI triage.
      */
