@@ -27,8 +27,8 @@
 
 | Package | Version | Description |
 | :--- | :--- | :--- |
-| [`@ticket-assistant/core`](./packages/core) | `1.0.0` | Headless triage engine, storage proxies, and framework router adapters. |
-| [`create-ticket-ai`](./packages/cli) | `1.0.0` | Interactive CLI to scaffold new projects or run `init` in existing codebases. |
+| [`@ticket-assistant/core`](./packages/core) | `1.0.1` | Headless triage engine, storage proxies, and framework router adapters. |
+| [`@ticket-assistant/cli`](./packages/cli) | `1.0.0` | Interactive CLI to scaffold new projects or run `init` in existing codebases. |
 | [`@ticket-assistant/dashboard`](./packages/dashboard) | `1.0.0` | React + Tailwind + Vite admin and agent workspace panel. |
 
 ---
@@ -40,13 +40,13 @@ The fastest way to get started is with the Ticket Assistant CLI:
 ### Option A: Initialize inside an existing codebase
 ```bash
 cd my-existing-project
-npx create-ticket-ai init
+npx @ticket-assistant/cli init
 ```
 This inspects your project (detecting Next.js or Express), installs dependencies, creates `ticket.config.js`, and sets up starter route handlers.
 
 ### Option B: Scaffold a brand-new project
 ```bash
-npx create-ticket-ai my-support-app
+npx @ticket-assistant/cli my-support-app
 ```
 Follow the interactive prompts to choose your database (Supabase or MongoDB) and AI provider (Groq or OpenAI).
 

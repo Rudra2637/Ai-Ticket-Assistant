@@ -1,8 +1,8 @@
-# create-ticket-ai (Ticket Assistant CLI)
+# @ticket-assistant/cli (Ticket Assistant CLI)
 
 > **Interactive CLI to scaffold or integrate Ticket Assistant into your application in seconds.**
 
-[![npm version](https://img.shields.io/npm/v/create-ticket-ai.svg)](https://www.npmjs.com/package/create-ticket-ai)
+[![npm version](https://img.shields.io/npm/v/@ticket-assistant/cli.svg)](https://www.npmjs.com/package/@ticket-assistant/cli)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
 ---
@@ -15,7 +15,7 @@ Add Ticket Assistant customer support to your existing Next.js, Express, or Node
 
 ```bash
 cd my-existing-project
-npx create-ticket-ai init
+npx @ticket-assistant/cli init
 ```
 
 The CLI will:
@@ -33,13 +33,13 @@ The CLI will:
 Scaffold a complete, standalone support backend from scratch:
 
 ```bash
-npx create-ticket-ai my-support-app
+npx @ticket-assistant/cli my-support-app
 ```
 
 Or pass flags to skip interactive prompts:
 
 ```bash
-npx create-ticket-ai my-support-app --template=express --storage=supabase --ai=groq
+npx @ticket-assistant/cli my-support-app --template=express --storage=supabase --ai=groq
 ```
 
 ---

@@ -1,9 +1,10 @@
 {
-    "name": "create-ticket-ai",
+    "name": "@ticket-assistant/cli",
     "version": "1.0.0",
     "description": "Scaffold and initialize AI-powered support ticket assistant",
     "type": "module",
     "bin": {
+        "ticket-assistant": "./bin/index.js",
         "create-ticket-ai": "./bin/index.js",
         "ticket-ai": "./bin/index.js"
     },
@@ -14,6 +15,25 @@
         "cli",
         "create-ticket-ai",
         "helpdesk"
+    ],
+    "author": "Rudra",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Rudra2637/Ai-Ticket-Assistant.git",
+        "directory": "packages/cli"
+    },
+    "homepage": "https://github.com/Rudra2637/Ai-Ticket-Assistant/tree/main/packages/cli#readme",
+    "bugs": {
+        "url": "https://github.com/Rudra2637/Ai-Ticket-Assistant/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "bin",
+        "src",
+        "README.md"
     ],
     "dependencies": {
         "@clack/prompts": "^1.7.0",
