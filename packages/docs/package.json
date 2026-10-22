@@ -1,0 +1,24 @@
+{
+  "name": "@ticket-assistant/docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Official documentation website for Ticket Assistant",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "lucide-react": "^0.475.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tailwindcss": "^4.1.0",
+    "vite": "^6.0.0"
+  }
+}
