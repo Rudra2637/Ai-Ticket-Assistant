@@ -1,9 +1,153 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --background: #08090d;
+  --foreground: #fafafa;
+  --accent: #00c950;
+  --accent-glow: rgba(0, 201, 80, 0.25);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-muted: rgba(255, 255, 255, 0.06);
+  --surface: #0e1017;
+  --surface-hover: #131620;
 }
 
-code, pre {
-  font-family: 'JetBrains Mono', monospace;
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+/* Reference Button Styles */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #00c950;
+  color: #08090d;
+  border: 1px solid transparent;
+  border-radius: 4.32px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Geist Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 3px 0px, rgba(255, 255, 255, 0.45) 0px 1px 0px 0px inset;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #00b347;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 3px 8px 0px, rgba(255, 255, 255, 0.35) 0px 1px 0px 0px inset;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #08090d;
+  color: #fafafa;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4.32px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Geist Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px 0px, rgba(255, 255, 255, 0.07) 0px 1px 0px 0px inset;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Reference Dashed Borders */
+.border-dashed-vertical {
+  background-image: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 8px, transparent 8px, transparent 16px);
+}
+
+.border-dashed-horizontal {
+  background-image: repeating-linear-gradient(to right, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 8px, transparent 8px, transparent 16px);
+}
+
+/* Subtle Matrix/Terminal Grid Background */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Corner bracket marker effect */
+.corner-bracket-container {
+  position: relative;
+}
+
+.corner-bracket-tl {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: border-color 0.2s;
+}
+
+.corner-bracket-tr {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: border-color 0.2s;
+}
+
+.corner-bracket-bl {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: border-color 0.2s;
+}
+
+.corner-bracket-br {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: border-color 0.2s;
+}
+
+.corner-bracket-container:hover .corner-bracket-tl,
+.corner-bracket-container:hover .corner-bracket-tr,
+.corner-bracket-container:hover .corner-bracket-bl,
+.corner-bracket-container:hover .corner-bracket-br {
+  border-color: #00c950;
 }
