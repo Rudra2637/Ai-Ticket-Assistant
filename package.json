@@ -11,6 +11,7 @@
     "dev": "turbo dev",
     "dev:core": "turbo dev --filter=@ticket-assistant/core",
     "dev:dashboard": "turbo dev --filter=@ticket-assistant/dashboard",
+    "dev:docs": "turbo dev --filter=@ticket-assistant/docs",
     "build": "turbo build",
     "lint": "turbo lint"
   },
