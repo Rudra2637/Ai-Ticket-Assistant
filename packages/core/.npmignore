@@ -1,0 +1,4 @@
+# Don't ship these to npm
+.env
+*.tgz
+.turbo/
