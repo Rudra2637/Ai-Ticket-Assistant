@@ -306,7 +306,7 @@ function TicketDetailsPage() {
                             <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] space-y-3 shadow-sm">
                                 <span className="text-[10px] text-[var(--text-muted)] font-mono font-bold uppercase block">AI Helpful Notes & Tips</span>
                                 <div className="prose prose-sm max-w-none text-xs text-[var(--text-muted)] font-medium leading-relaxed font-sans overflow-x-hidden dark:prose-invert">
-                                    <ReactMarkdown>{ticket.helpfullNotes}</ReactMarkdown>
+                                    <ReactMarkdown>{ticket.helpfulNotes || ticket.helpfullNotes}</ReactMarkdown>
                                 </div>
                             </div>
                         )}

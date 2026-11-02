@@ -105,6 +105,29 @@ function Admin() {
         }
     };
 
+    const handleDelete = async (agentId, agentName) => {
+        const confirmed = window.confirm(`Are you sure you want to delete agent "${agentName}"?`);
+        if (!confirmed) return;
+
+        try {
+            const res = await fetch(`${API_URL}/agents/${agentId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setModerators(prev => prev.filter(m => (m._id || m.id) !== agentId));
+            } else {
+                alert(data.error || data.message || "Failed to delete agent");
+            }
+        } catch (error) {
+            console.error("Error deleting agent:", error);
+            alert("Network error while deleting agent");
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -287,6 +310,17 @@ function Admin() {
                                             )}
                                         </div>
                                     </div>
+
+                                    {/* Delete Agent Action */}
+                                    <button
+                                        onClick={() => handleDelete(modItem._id || modItem.id, modItem.name || modItem.email)}
+                                        className="p-2 rounded-xl text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition self-end md:self-center shrink-0"
+                                        title="Delete Agent"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
                                 </div>
                             ))}
 

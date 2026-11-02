@@ -1,6 +1,126 @@
 import { BaseAIProvider } from './base.ai.js';
 
 /**
+ * Extracts and parses JSON from raw AI response text.
+ * Strategy:
+ * 1. Try JSON.parse directly first.
+ * 2. Fall back to markdown code fence extraction (```json ... ```).
+ * 3. Fall back to boundary brace extraction (first '{' to last '}').
+ */
+export function extractAndParseJSON(rawContent) {
+    if (!rawContent || typeof rawContent !== 'string') {
+        throw new Error('Empty or non-string AI response content');
+    }
+
+    const trimmed = rawContent.trim();
+
+    // 1. Direct JSON.parse
+    try {
+        return JSON.parse(trimmed);
+    } catch (_) {
+        // Fall through to markdown code fence extraction
+    }
+
+    // 2. Fence extraction (```json ... ``` or ``` ... ```)
+    const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (fenceMatch && fenceMatch[1]) {
+        try {
+            return JSON.parse(fenceMatch[1].trim());
+        } catch (_) {
+            // Fall through to brace extraction
+        }
+    }
+
+    // 3. Brace extraction (first '{' to last '}')
+    const firstBrace = trimmed.indexOf('{');
+    const lastBrace = trimmed.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        const braceContent = trimmed.slice(firstBrace, lastBrace + 1).trim();
+        try {
+            return JSON.parse(braceContent);
+        } catch (braceErr) {
+            throw new Error(`Failed to parse extracted JSON object: ${braceErr.message}`);
+        }
+    }
+
+    throw new Error('No valid JSON structure found in AI response');
+}
+
+/**
+ * Validates the parsed object against the triage schema and logs warnings when defaults are applied.
+ */
+export function validateAndNormalizeAIResponse(parsed, logger = console) {
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Parsed response must be a non-null object');
+    }
+
+    const result = {};
+
+    // 1. summary (string)
+    if (typeof parsed.summary === 'string' && parsed.summary.trim()) {
+        result.summary = parsed.summary.trim();
+    } else {
+        logger.warn('[Ticket Assistant AI] Warning: Field "summary" missing or invalid, defaulted to empty string.');
+        result.summary = '';
+    }
+
+    // 2. priority ('low' | 'medium' | 'high')
+    const rawPriority = String(parsed.priority || '').toLowerCase().trim();
+    if (['high', 'urgent', 'critical', 'p0', 'p1', 'severe'].includes(rawPriority)) {
+        result.priority = 'high';
+        if (rawPriority !== 'high') {
+            logger.warn(`[Ticket Assistant AI] Warning: Non-standard priority "${parsed.priority}" mapped to "high".`);
+        }
+    } else if (['low', 'minor', 'trivial', 'p3', 'p4'].includes(rawPriority)) {
+        result.priority = 'low';
+        if (rawPriority !== 'low') {
+            logger.warn(`[Ticket Assistant AI] Warning: Non-standard priority "${parsed.priority}" mapped to "low".`);
+        }
+    } else if (rawPriority === 'medium' || rawPriority === 'p2' || rawPriority === 'normal') {
+        result.priority = 'medium';
+    } else {
+        logger.warn(`[Ticket Assistant AI] Warning: Field "priority" missing or unrecognized ("${parsed.priority}"), defaulted to "medium".`);
+        result.priority = 'medium';
+    }
+
+    // 3. helpfulNotes (string, accepts helpfulNotes, helpfullNotes, or notes)
+    const rawNotes = parsed.helpfulNotes ?? parsed.helpfullNotes ?? parsed.notes;
+    if (typeof rawNotes === 'string') {
+        result.helpfulNotes = rawNotes.trim();
+    } else {
+        logger.warn('[Ticket Assistant AI] Warning: Field "helpfulNotes" missing or invalid, defaulted to empty string.');
+        result.helpfulNotes = '';
+    }
+
+    // 4. relatedSkills (array of strings, coerces comma/newline-separated strings)
+    const rawSkills = parsed.relatedSkills ?? parsed.skills;
+    if (Array.isArray(rawSkills)) {
+        result.relatedSkills = rawSkills
+            .map(s => String(s).trim())
+            .filter(Boolean);
+    } else if (typeof rawSkills === 'string' && rawSkills.trim()) {
+        logger.warn(`[Ticket Assistant AI] Warning: "relatedSkills" was returned as a string ("${rawSkills}"), coerced to array.`);
+        result.relatedSkills = rawSkills
+            .split(/[,;\n]+/)
+            .map(s => s.trim())
+            .filter(Boolean);
+    } else {
+        logger.warn('[Ticket Assistant AI] Warning: Field "relatedSkills" missing or invalid, defaulted to empty array [].');
+        result.relatedSkills = [];
+    }
+
+    return result;
+}
+
+/**
+ * Pure parsing + schema validation helper.
+ */
+export function parseAndValidateAIResponse(rawContent, logger = console) {
+    const parsed = extractAndParseJSON(rawContent);
+    return validateAndNormalizeAIResponse(parsed, logger);
+}
+
+/**
  * DefaultAIProvider
  * Built-in standard AI provider using native fetch.
  * Compatible with any OpenAI-compatible API (Groq, OpenAI, Ollama, DeepSeek, Together AI, OpenRouter, etc.).
@@ -77,7 +197,8 @@ export class DefaultAIProvider extends BaseAIProvider {
     }
 
     /**
-     * Analyze ticket with active AI provider using standard fetch
+     * Analyze ticket with active AI provider using standard fetch.
+     * Retries once on failure.
      * @param {Object} ticket - { title: string, description: string }
      */
     async analyzeTicket(ticket) {
@@ -117,22 +238,29 @@ Do NOT wrap in markdown, backticks, or code blocks. Return ONLY raw JSON.`;
 - Title: ${ticket.title}
 - Description: ${ticket.description}`;
 
-        try {
-            const endpoint = `${this.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+        const endpoint = `${this.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+
+        const executeCall = async (includeJsonMode = true) => {
+            const bodyPayload = {
+                model: this.model,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                temperature: 0.1
+            };
+
+            if (includeJsonMode) {
+                bodyPayload.response_format = { type: 'json_object' };
+            }
+
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.apiKey}`
                 },
-                body: JSON.stringify({
-                    model: this.model,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userPrompt }
-                    ],
-                    temperature: 0.2
-                })
+                body: JSON.stringify(bodyPayload)
             });
 
             if (!res.ok) {
@@ -142,24 +270,23 @@ Do NOT wrap in markdown, backticks, or code blocks. Return ONLY raw JSON.`;
 
             const data = await res.json();
             const rawContent = data.choices?.[0]?.message?.content || '';
+            return parseAndValidateAIResponse(rawContent);
+        };
 
-            // Extract JSON even if wrapped in markdown code blocks
-            const jsonMatch = rawContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-            const jsonString = jsonMatch ? jsonMatch[1].trim() : rawContent.trim();
-
-            const parsed = JSON.parse(jsonString);
-
-            return {
-                summary: parsed.summary || '',
-                priority: parsed.priority || 'medium',
-                helpfulNotes: parsed.helpfulNotes || parsed.helpfullNotes || '',
-                relatedSkills: Array.isArray(parsed.relatedSkills) ? parsed.relatedSkills : []
-            };
-        } catch (error) {
-            console.error(`[Ticket Assistant AI] Triage failed: ${error.message}`);
-            console.error(`[Ticket Assistant AI] Diagnostics -> Endpoint: ${this.baseUrl} | Model: ${this.model} | Provider: ${this.provider}`);
-            return null;
+        // Attempt 1 with automatic retry on failure
+        try {
+            return await executeCall(true);
+        } catch (firstError) {
+            console.warn(`[Ticket Assistant AI] Triage attempt 1 failed: ${firstError.message}. Retrying once...`);
+            try {
+                // If the provider doesn't support response_format, fallback without it on retry
+                const retryWithJsonMode = !firstError.message.includes('response_format');
+                return await executeCall(retryWithJsonMode);
+            } catch (retryError) {
+                console.error(`[Ticket Assistant AI] Triage failed on retry: ${retryError.message}`);
+                console.error(`[Ticket Assistant AI] Diagnostics -> Endpoint: ${this.baseUrl} | Model: ${this.model} | Provider: ${this.provider}`);
+                return null;
+            }
         }
     }
 }
-

@@ -38,18 +38,41 @@ export const onticketCreate = async (data) => {
             });
         }
 
-        // 3. Match with Agents by skills
+        // 3. Match with Agents by maximum matching skills
         const agents = await storage.getAgents();
+        const agentList = Array.isArray(agents) ? agents : (agents?.agents || []);
 
-        const assignedAgent = agents.find(agent =>
-            Array.isArray(agent.skills) && agent.skills.some(skill =>
-                relatedSkills.some(rs =>
-                    skill.toLowerCase().includes(rs.toLowerCase()) ||
-                    rs.toLowerCase().includes(skill.toLowerCase())
-                )
-            )
-        ) || null;
+        let assignedAgent = null;
 
+        if (relatedSkills.length > 0 && agentList.length > 0) {
+            const normalizedRequirements = relatedSkills.map(s => s.toLowerCase().trim()).filter(Boolean);
+
+            const scoredAgents = agentList.map(agent => {
+                if (!Array.isArray(agent.skills) || agent.skills.length === 0) {
+                    return { agent, score: 0 };
+                }
+
+                const agentSkills = agent.skills.map(s => s.toLowerCase().trim()).filter(Boolean);
+
+                // Count how many required skills this agent satisfies
+                const matchCount = normalizedRequirements.reduce((count, reqSkill) => {
+                    const hasMatch = agentSkills.some(
+                        skill => skill.includes(reqSkill) || reqSkill.includes(skill)
+                    );
+                    return hasMatch ? count + 1 : count;
+                }, 0);
+
+                return { agent, score: matchCount };
+            });
+
+            // Sort by score descending (highest score first)
+            scoredAgents.sort((a, b) => b.score - a.score);
+
+            if (scoredAgents[0]?.score > 0) {
+                assignedAgent = scoredAgents[0].agent;
+            }
+        }
+        
         // 4. Update ticket assignment (null if no skill match -> manual triage)
         await storage.updateTicket(ticket._id || ticket.id, {
             assignedTo: assignedAgent ? (assignedAgent._id || assignedAgent.id) : null
