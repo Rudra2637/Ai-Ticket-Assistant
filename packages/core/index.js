@@ -105,6 +105,10 @@ export class TicketAssistant {
         return this.storage.deleteAgent(id);
     }
 
+    async deleteTicket(id) {
+        return this.storage.deleteTicket(id)
+    }
+
     /**
      * Seeds initial agents defined in config.agents.
      * Idempotent: Checks if agent already exists by email before inserting.

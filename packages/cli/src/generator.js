@@ -16,9 +16,10 @@ function getConfigContent(dbChoice, aiChoice) {
     };
 
     const aiModelMap = {
-        groq: 'openai/gpt-oss-20b',
+        groq: 'llama-3.3-70b-versatile',
         openai: 'gpt-4o-mini',
-        gemini: 'gemini-2.0-flash'
+        gemini: 'gemini-2.0-flash',
+        claude: 'claude-3-5-haiku-20241022'
     };
 
     const storageConfig = dbChoice === 'mongo'

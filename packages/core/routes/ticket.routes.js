@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTicket, getTicket, getTickets, updateTicket } from '../controllers/ticket.controller.js';
+import { createTicket, deleteTicket, getTicket, getTickets, updateTicket } from '../controllers/ticket.controller.js';
 
 export function createTicketRouter(auth = {}) {
     const router = express.Router();
@@ -14,8 +14,9 @@ export function createTicketRouter(auth = {}) {
     router.get("/:id", customerAuth, getTicket);
     router.post("/", customerAuth, createTicket);
     router.patch("/:id", agentAuth, updateTicket);
+    router.delete("/:id",agentAuth, deleteTicket);
 
     return router;
 }
 
-export default createTicketRouter;
+export default createTicketRouter;

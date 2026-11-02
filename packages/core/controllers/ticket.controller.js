@@ -82,3 +82,19 @@ export const updateTicket = async (req, res) => {
         return res.status(500).json({ error: "Error updating ticket" });
     }
 };
+
+export const deleteTicket = async (req, res) => {
+    try {
+        const ticketId = req.params.id;
+        const deleted = await storage.deleteTicket(ticketId);
+
+        if (!deleted) {
+            return res.status(404).json({ error: "Ticket not found" });
+        }
+
+        return res.status(200).json({ message: "Ticket deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting ticket:", error.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};

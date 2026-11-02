@@ -90,6 +90,8 @@ export declare class TicketAssistant {
 
     updateTicket(id: string, updates: Partial<TicketData>): Promise<TicketData | null>;
 
+    deleteTicket(id: string): Promise<boolean>;
+
     createAgent(data: AgentData): Promise<AgentData>;
 
     getAgents(): Promise<AgentData[]>;
