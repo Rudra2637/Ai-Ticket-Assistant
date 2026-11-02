@@ -271,14 +271,14 @@ function TicketDetailsPage() {
                             <span className="text-[10px] text-[var(--text-muted)] font-mono font-bold uppercase block">Assigned Support Staff</span>
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-[var(--input-bg)] border border-[var(--border-color)] flex items-center justify-center text-xs font-extrabold text-[var(--text-color)] opacity-85 uppercase font-mono">
-                                    {ticket.assisgnedTo?.email ? ticket.assisgnedTo.email[0] : "?"}
+                                    {ticket.assignedTo?.email ? ticket.assignedTo.email[0] : "?"}
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     <span className="text-xs font-extrabold text-[var(--text-color)] truncate">
-                                        {ticket.assisgnedTo?.email || "Assigning..."}
+                                        {ticket.assignedTo?.email || "Assigning..."}
                                     </span>
                                     <span className="text-[9px] font-mono text-[var(--text-muted)] font-bold uppercase tracking-wider">
-                                        {ticket.assisgnedTo?.email ? "Responsible Agent" : "AI Routing..."}
+                                        {ticket.assignedTo?.email ? "Responsible Agent" : "AI Routing..."}
                                     </span>
                                 </div>
                             </div>
@@ -302,7 +302,7 @@ function TicketDetailsPage() {
                         )}
 
                         {/* AI Helpful Notes */}
-                        {ticket.helpfullNotes && (
+                        {ticket.helpfulNotes && (
                             <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] space-y-3 shadow-sm">
                                 <span className="text-[10px] text-[var(--text-muted)] font-mono font-bold uppercase block">AI Helpful Notes & Tips</span>
                                 <div className="prose prose-sm max-w-none text-xs text-[var(--text-muted)] font-medium leading-relaxed font-sans overflow-x-hidden dark:prose-invert">
