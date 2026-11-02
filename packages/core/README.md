@@ -261,7 +261,7 @@ const assistant = new TicketAssistant({
 const assistant = new TicketAssistant({
   ai: {
     apiKey: process.env.GROQ_API_KEY,
-    model: 'openai/gpt-oss-20b' // or 'qwen/qwen3.8-27b'
+    model: 'llama-3.3-70b-versatile'
   }
 });
 
@@ -293,12 +293,14 @@ const assistant = new TicketAssistant({
 * `assistant.getTickets(filter)`: Returns array of tickets matching optional `{ status, assignedTo, createdBy }`.
 * `assistant.getTicket(id)`: Returns ticket by ID.
 * `assistant.updateTicket(id, updates)`: Updates status, priority, or assigned agent.
+* `assistant.deleteTicket(id)`: Permanently deletes a ticket by ID.
 
 ### Agents
-* `assistant.createAgent({ name, email, skills })`: Adds a support agent for AI routing.
+* `assistant.createAgent({ name, email, skills, password })`: Adds a support agent for AI routing (auto-hashes password).
 * `assistant.getAgents()`: Returns all registered agents and their skill keywords.
-* `assistant.getAgentByEmail(email)`: Finds agent by email.
-* `assistant.updateAgent(id, updates)`: Updates agent skills or name.
+* `assistant.getAgentByEmail(email, options)`: Finds agent by email (optionally including password hash).
+* `assistant.verifyAgentCredentials(email, password)`: Verifies credentials in constant time (`scryptSync`).
+* `assistant.updateAgent(id, updates)`: Updates agent skills, name, or metadata.
 * `assistant.deleteAgent(id)`: Deletes an agent.
 
 ---

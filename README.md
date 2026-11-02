@@ -13,12 +13,12 @@
 
 ##  Highlights
 
-*  **Autonomous AI Triage**: Evaluates inbound tickets in real time, generates issue summaries, estimates priority (`low` | `medium` | `high`), recommends troubleshooting notes, and extracts required skills.
-*  **Skill-Based Agent Routing**: Automatically matches incoming tickets to the support agent with the highest skill overlap.
+* 🧠 **Resilient AI Triage**: Multi-tier extraction (direct `JSON.parse` → markdown fences → boundary brace extraction) with automatic retry and schema normalization. Generates issue summaries, estimates priority (`low` | `medium` | `high`), recommends troubleshooting notes, and extracts required skills.
+* 🎯 **Smart Skill-Based Agent Routing**: Automatically scores all registered agents by skill overlap and assigns incoming tickets to the support agent with the highest domain match.
 * 🔌 **Pluggable Storage**: First-class support for **MongoDB** (Mongoose) and **Supabase** (PostgreSQL) using namespaced `ticketai_*` tables.
-*  **Universal Engine**: Works natively in **Next.js (App Router)**, **Express.js**, Remix, or pure serverless runtimes.
+* ⚡ **Universal Engine**: Works natively in **Next.js (App Router)**, **Express.js**, Remix, or pure serverless runtimes.
 * 🔐 **Batteries-Included, Auth-Agnostic**: Built-in zero-dependency password hashing & credential verification (`verifyAgentCredentials`), while staying 100% compatible with Clerk, Supabase Auth, NextAuth / Auth.js, Firebase, or custom JWT.
-*  **Zero Queue Lock-in**: Powered by a lightweight native async engine—no Redis or third-party queue services required for local or serverless deployment.
+* 🚀 **Zero Queue Lock-in**: Powered by a lightweight native async engine—no Redis or third-party queue services required for local or serverless deployment.
 * 🤖 **Bring Your Own AI**: Native support for **Groq** (ultra-fast 200ms triage), **OpenAI**, **Gemini**, **DeepSeek**, or local **Ollama** models.
 
 ---
@@ -30,6 +30,7 @@
 | [`@ticket-assistant/core`](./packages/core) | `1.0.1` | Headless triage engine, storage proxies, and framework router adapters. |
 | [`@ticket-assistant/cli`](./packages/cli) | `1.0.0` | Interactive CLI to scaffold new projects or run `init` in existing codebases. |
 | [`@ticket-assistant/dashboard`](./packages/dashboard) | `1.0.0` | React + Tailwind + Vite admin and agent workspace panel. |
+| [`@ticket-assistant/docs`](./packages/docs) | `1.0.0` | Documentation website & landing page powered by Vite & Tailwind CSS. |
 
 ---
 
@@ -150,7 +151,9 @@ const assistant = new TicketAssistant({
 
 await assistant.connect();
 
-// Mounts GET /api/tickets, POST /api/tickets, GET /api/agents, etc.
+// Mounts:
+// Tickets: GET /api/tickets, POST /api/tickets, GET /api/tickets/:id, PATCH /api/tickets/:id, DELETE /api/tickets/:id
+// Agents:  GET /api/agents, POST /api/agents, PATCH /api/agents/:id, DELETE /api/agents/:id
 app.use('/api', await assistant.getRouter());
 
 app.listen(3000, () => {
@@ -230,7 +233,7 @@ AI_MODEL=gemini-2.0-flash
 
 # OR 2. Groq:
 # GROQ_API_KEY=gsk_...
-# AI_MODEL=openai/gpt-oss-20b
+# AI_MODEL=llama-3.3-70b-versatile
 
 # OR 3. OpenAI:
 # OPENAI_API_KEY=sk-...
